@@ -1,0 +1,57 @@
+NPC classes:
+	- ex: Goblin(), Wolf(), Human(), ...
+	- abstract class Human(), HumanDefias(), ... 
+
+Combat system:
+	- crit
+	- hit/miss
+	- dodge
+	- parry
+	- block 
+
+Sound:
+	- walk sound
+	- attack swing sound
+	- weapon hit sound
+	- crit sound
+	- aggro sound
+	- death sound
+	- other combat sound
+	- ...
+
+Input
+	- Rigth click
+	- distinction between the 2.
+
+Target system
+		- player is agressive toward target on right click only
+		- a way to remove target (esc and/or other)
+
+NPC ai
+	- Agro system
+	- wander speed vs aggro running speed
+
+Animation
+	- basic attack stance
+	- npc attack animation
+	- player hurt animiation
+
+UserInterface (UI):
+	- improve character/ equipment panel
+	- player unit frame
+	- target unit frame
+	- looting interface:
+		- open loot panel 
+		- only open loot panel when z is pressed near a corpse
+		- player clicks ont item to loot.
+		- close button.
+	- spell bar
+
+Spells & abilities
+	- auto attack icon.
+
+Quest System
+Drop
+Loot
+Equip items from inventory
+info by toggling over item
