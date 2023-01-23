@@ -5,7 +5,7 @@ import controller.NPCController;
 import core.Log;
 import core.Position;
 import core.Size;
-import display.ui.GameUI;
+import display.ui.UI;
 import entity.NPC;
 import entity.Player;
 import entity.character.Character;
@@ -15,14 +15,16 @@ import gfx.SpriteLibrary;
 import input.Input;
 import map.GameMap;
 
+import java.util.ArrayList;
+
 public class GameState extends State{
 
-    public GameState(Size windowSize, Input input, Character character, Player player, AudioPlayer audioPlayer, SpriteLibrary spriteLibrary, Log log) {
+    public GameState(Size windowSize, Input input, Character character, Player player, AudioPlayer audioPlayer, SpriteLibrary spriteLibrary, Log log, ArrayList<UI> uis) {
         super(windowSize, input, character, player, audioPlayer, spriteLibrary, log);
         input.setCamera(camera);
-        ui = new GameUI();
         gameMap = new GameMap(new Size(200,200),spriteLibrary);
         initializeCharacters();
+        this.uis = uis;
 
         audioPlayer.playMusic("ElwynnForest.wav");
     }
@@ -50,6 +52,9 @@ public class GameState extends State{
         respawn();
         super.update();
         character.update();
+        for(UI ui: uis){
+            ui.update(audioPlayer);
+        }
     }
 
     @Override

@@ -3,7 +3,9 @@ package display;
 import core.Log;
 import core.Position;
 import core.Size;
+import display.ui.InventoryUI;
 import display.ui.LogBoxUI;
+import display.ui.UI;
 import entity.GameObject;
 import entity.GameObjectID;
 import entity.Player;
@@ -13,19 +15,20 @@ import map.Tile;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 
 public class Renderer {
 
     private Log log;
     private Player player;
-    private LogBoxUI logBoxUI;
+    private ArrayList<UI> uis;
 
 
-    public Renderer(Player player, Log log) {
+    public Renderer(Player player, Log log, ArrayList<UI> uis) {
         this.log = log;
         this.player = player;
-        logBoxUI = new LogBoxUI();
+        this.uis = uis;
     }
 
     public void render(State state, Graphics graphics) {
@@ -252,47 +255,15 @@ public class Renderer {
 
     // UI //
     private void renderUI(State state, Graphics graphics) {
-        renderInventory(graphics);
         renderEquipment(graphics);
         renderUnitFrames(state, graphics);
         renderExpBar(graphics);
         renderSpellBar(graphics);
+
+        LogBoxUI logBoxUI = (LogBoxUI) uis.get(0);
         logBoxUI.render(graphics, log);
-    }
-
-    private void renderInventory(Graphics graphics) {
-
-        if (player.getInventory().isOpen()) {
-            Position inventoryPosition = new Position(652,300);
-            Size inventorySize = new Size(138,200);
-            //Background
-            graphics.setColor(new Color(70, 70, 70));
-            graphics.fillRect(inventoryPosition.intX(), inventoryPosition.intY(), inventorySize.getWidth(), inventorySize.getHeight());
-            graphics.setColor(new Color(0, 0, 0));
-            graphics.drawRect(inventoryPosition.intX(), inventoryPosition.intY(), inventorySize.getWidth(), inventorySize.getHeight());
-
-            //Inventory top
-            graphics.setColor(new Color(70, 70, 70));
-            graphics.fillRect(inventoryPosition.intX() + 5, inventoryPosition.intY() + 5, inventorySize.getWidth() - 10, 24);
-            graphics.setColor(new Color(0, 0, 0));
-            graphics.drawRect(inventoryPosition.intX() + 5, inventoryPosition.intY() + 5, inventorySize.getWidth() - 10, 24);
-
-            graphics.setFont(new Font("TimesRoman", Font.BOLD, 12));
-            graphics.drawString("Inventory", 702, 322);
-
-            // Each space
-            for (int x = 0; x < 4; x++) {
-                for (int y = 0; y < 5; y++) {
-                    graphics.setColor(new Color(70, 70, 70));
-                    graphics.fillRect(x * 32 + inventoryPosition.intX() + 5, y * 32 + inventoryPosition.intY() + 35, 32, 32);
-                    graphics.setColor(new Color(0, 0, 0));
-                    graphics.drawRect(x * 32 + inventoryPosition.intX() + 5, y * 32 + inventoryPosition.intY() + 35, 32, 32);
-                    if (player.getInventory().getItems()[(x + y * 4)] != null) {
-                        graphics.drawImage(player.getInventory().getItems()[(x + y * 4)].getIconSprite(), x * 32 + inventoryPosition.intX() + 5, y * 32 + inventoryPosition.intY() + 35, null);
-                    }
-                }
-            }
-        }
+        InventoryUI bagUI = (InventoryUI) uis.get(1);
+        bagUI.render(graphics);
     }
 
     private void renderEquipment(Graphics graphics) {

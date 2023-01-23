@@ -1,5 +1,6 @@
 package display.ui;
 
+import audio.AudioPlayer;
 import core.Log;
 import core.Position;
 import settings.Settings;
@@ -9,7 +10,6 @@ import java.awt.*;
 public class LogBoxUI extends UI {
 
     private Dimension dimension = new Dimension(510,200);
-    private Position position = new Position(20, Settings.WINDOW_HEIGHT - dimension.height - 35);
     private Color colorBackground= new Color(70,70,70,150);
     private Color colorLogMenuTitle = Color.yellow;;
     private Color colorText = Color.black;
@@ -20,6 +20,15 @@ public class LogBoxUI extends UI {
     private boolean logBoxGeneralIsOpen = false;
     private boolean logBoxCombatMyActionsIsOpen = true;
     private boolean isTyping = false;
+
+    public LogBoxUI(){
+        enabled = true;
+        position = new Position(20, Settings.WINDOW_HEIGHT - dimension.height - 35);
+    }
+
+    @Override
+    public void update(AudioPlayer audioPlayer) {
+    }
 
     public void render(Graphics graphics, Log log) {
 

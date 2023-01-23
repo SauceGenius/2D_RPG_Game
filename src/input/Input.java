@@ -12,7 +12,6 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
     private Position mousePosition;
     private boolean mouseClicked;
     private boolean mousePressed;
-
     private boolean[] pressed;
     private boolean attackRequested = false;
     private boolean inventoryIsOpen = false;
@@ -52,7 +51,6 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
 
     public void clearMouseClicked() {mouseClicked = false;}
     public Position getMousePosition() {return mousePosition;}
-
     public boolean isMouseClicked() {return mouseClicked;}
     public boolean isMousePressed() {return mousePressed;}
 
@@ -87,9 +85,6 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
     @Override
     public void keyPressed(KeyEvent e) {
         pressed[e.getKeyCode()] = true;
-        if (e.getKeyCode() == KeyEvent.VK_CONTROL){
-            attackRequested = true;
-        }
     }
 
     @Override

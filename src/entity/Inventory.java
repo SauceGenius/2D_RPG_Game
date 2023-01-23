@@ -11,7 +11,7 @@ import gfx.SpriteLibrary;
 public class Inventory {
 
     private boolean isOpen = false;
-    private int space = 20;
+    private int space = 16;
     private PlayerController playerController;
     private SpriteLibrary spriteLibrary;
     Item items[] = new Item[space];
@@ -22,12 +22,12 @@ public class Inventory {
     }
 
     public void update(AudioPlayer audioPlayer) {
-        if (!isOpen && playerController.isInventoryOpen()) {
+        /*if (!isOpen && playerController.isInventoryOpen()) {
                 isOpen = true;
                 audioPlayer.playSound("OpenBag.wav");
             } else if (playerController.isInventoryOpen()) {
                 isOpen = true;
-            } else isOpen = false;
+            } else isOpen = false;*/
 
 
     }

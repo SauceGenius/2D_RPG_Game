@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 public abstract class State {
 
     protected Log log;
-    protected UI ui;
+    protected ArrayList<UI> uis;
     protected AudioPlayer audioPlayer;
     protected GameMap gameMap;
     protected List<GameObject> gameObjects;
