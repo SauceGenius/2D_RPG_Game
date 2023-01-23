@@ -9,6 +9,7 @@ import java.awt.*;
 
 public class LogBoxUI extends UI {
 
+    private Log log;
     private Dimension dimension = new Dimension(510,200);
     private Color colorBackground= new Color(70,70,70,150);
     private Color colorLogMenuTitle = Color.yellow;;
@@ -21,8 +22,9 @@ public class LogBoxUI extends UI {
     private boolean logBoxCombatMyActionsIsOpen = true;
     private boolean isTyping = false;
 
-    public LogBoxUI(){
+    public LogBoxUI(Log log){
         enabled = true;
+        this.log = log;
         position = new Position(20, Settings.WINDOW_HEIGHT - dimension.height - 35);
     }
 
@@ -30,7 +32,8 @@ public class LogBoxUI extends UI {
     public void update(AudioPlayer audioPlayer) {
     }
 
-    public void render(Graphics graphics, Log log) {
+    @Override
+    public void render(Graphics graphics) {
 
         int logX = position.intX();
         int logY = position.intY();
@@ -88,5 +91,10 @@ public class LogBoxUI extends UI {
                 }
             }
         }
+    }
+
+    @Override
+    public void open() {
+
     }
 }

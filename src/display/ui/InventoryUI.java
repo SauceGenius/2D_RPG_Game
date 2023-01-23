@@ -1,35 +1,34 @@
 package display.ui;
 
 import audio.AudioPlayer;
-import controller.PlayerController;
 import core.Position;
 import entity.Inventory;
 
-import java.awt.*;
+import java.awt.*;;
 
 public class InventoryUI extends UI {
 
     private Inventory inventory;
-    private PlayerController playerController;
-    public InventoryUI(Inventory inventory, PlayerController playerController) {
+
+
+    public InventoryUI(AudioPlayer audioPlayer, Inventory inventory) {
         enabled = false;
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         Image bagImage = toolkit.getImage("resources/sprites/ui/Bag.png");
         images.add(bagImage);
         position = new Position(1600,700);
+        this.audioPlayer = audioPlayer;
         this.inventory = inventory;
-        this.playerController = playerController;
     }
 
     public void update(AudioPlayer audioPlayer) {
-        if (!enabled && playerController.isInventoryOpen()) {
+        /*if (!enabled) {
             enabled = true;
             audioPlayer.playSound("OpenBag.wav");
-        } else if (playerController.isInventoryOpen()) {
-            enabled = true;
-        } else enabled = false;
+        } else enabled = false;*/
     }
 
+    @Override
     public void render(Graphics graphics){
         if(enabled){
             graphics.drawImage(images.get(0), position.intX(), position.intY(), null);
@@ -59,5 +58,13 @@ public class InventoryUI extends UI {
                 }
             }
         }
+    }
+
+    @Override
+    public void open(){
+        if (!enabled) {
+            enabled = true;
+            audioPlayer.playSound("OpenBag.wav");
+        } else enabled = false;
     }
 }

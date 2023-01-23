@@ -6,12 +6,14 @@ import core.Size;
 import display.ui.InventoryUI;
 import display.ui.LogBoxUI;
 import display.ui.UI;
+import display.ui.UIManager;
 import entity.GameObject;
 import entity.GameObjectID;
 import entity.Player;
 import game.Game;
 import game.state.State;
 import map.Tile;
+import settings.Settings;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -22,13 +24,13 @@ public class Renderer {
 
     private Log log;
     private Player player;
-    private ArrayList<UI> uis;
+    private UIManager uiManager;
 
 
-    public Renderer(Player player, Log log, ArrayList<UI> uis) {
+    public Renderer(Player player, Log log, UIManager uiManager) {
         this.log = log;
         this.player = player;
-        this.uis = uis;
+        this.uiManager = uiManager;
     }
 
     public void render(State state, Graphics graphics) {
@@ -53,8 +55,8 @@ public class Renderer {
             for (int y = 0; y < tiles[0].length; y++) {
                 graphics.drawImage(
                         tiles[x][y].getSprite(),
-                        x * Game.SPRITE_SIZE_TILE - camera.getPosition().intX(),
-                        y * Game.SPRITE_SIZE_TILE - camera.getPosition().intY(),
+                        x * Settings.SPRITE_SIZE_TILE - camera.getPosition().intX(),
+                        y * Settings.SPRITE_SIZE_TILE - camera.getPosition().intY(),
                         null);
             }
         }
@@ -259,10 +261,14 @@ public class Renderer {
         renderExpBar(graphics);
         renderSpellBar(graphics);
 
+        /*
         LogBoxUI logBoxUI = (LogBoxUI) uis.get(0);
         logBoxUI.render(graphics, log);
         InventoryUI bagUI = (InventoryUI) uis.get(1);
         bagUI.render(graphics);
+        */
+
+        uiManager.render(graphics);
     }
 
     private void renderEquipment(Graphics graphics) {

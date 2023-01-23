@@ -8,6 +8,7 @@ import game.Game;
 import game.state.State;
 import gfx.AnimationManager;
 import gfx.SpriteLibrary;
+import settings.Settings;
 
 import java.awt.*;
 
@@ -61,7 +62,7 @@ public abstract class MovingEntity extends GameObject{
 
     @Override
     public CollisionBox getCollisionBox() {
-        return new CollisionBox(new Rectangle(position.intX() + 10, position.intY() + Game.SPRITE_SIZE_PLAYER/2 - 4, size.getWidth()/2, size.getHeight()/4 + 4));
+        return new CollisionBox(new Rectangle(position.intX() + 10, position.intY() + Settings.SPRITE_SIZE_PLAYER/2 - 4, size.getWidth()/2, size.getHeight()/4 + 4));
     }
 
     public CollisionBox getHitBox(){

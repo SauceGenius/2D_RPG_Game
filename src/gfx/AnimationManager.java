@@ -6,6 +6,7 @@ import entity.stats.Stats;
 import entity.stats.Status;
 import game.Game;
 import core.Time;
+import settings.Settings;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -43,15 +44,15 @@ public class AnimationManager {
     }
 
     public Image getSprite(){
-        if(frameIndex >= currentAnimationSheet.getWidth() / Game.SPRITE_SIZE_PLAYER) {
+        if(frameIndex >= currentAnimationSheet.getWidth() / Settings.SPRITE_SIZE_PLAYER) {
             frameIndex = 0;
         }
 
         return currentAnimationSheet.getSubimage(
-                frameIndex * Game.SPRITE_SIZE_PLAYER,
-                directionIndex * Game.SPRITE_SIZE_PLAYER,
-                Game.SPRITE_SIZE_PLAYER,
-                Game.SPRITE_SIZE_PLAYER);
+                frameIndex * Settings.SPRITE_SIZE_PLAYER,
+                directionIndex * Settings.SPRITE_SIZE_PLAYER,
+                Settings.SPRITE_SIZE_PLAYER,
+                Settings.SPRITE_SIZE_PLAYER);
     }
 
     public void update(Direction direction){
@@ -70,7 +71,7 @@ public class AnimationManager {
                     currentFrameTime = 0;
                     frameIndex++;
 
-                    if (frameIndex >= currentAnimationSheet.getWidth() / Game.SPRITE_SIZE_PLAYER) {
+                    if (frameIndex >= currentAnimationSheet.getWidth() / Settings.SPRITE_SIZE_PLAYER) {
                         frameIndex = 0;
                     }
                 }
@@ -87,7 +88,7 @@ public class AnimationManager {
                     currentFrameTime = 0;
                     frameIndex++;
 
-                    if (frameIndex >= currentAnimationSheet.getWidth() / Game.SPRITE_SIZE_PLAYER) {
+                    if (frameIndex >= currentAnimationSheet.getWidth() / Settings.SPRITE_SIZE_PLAYER) {
                         frameIndex = 0;
                     }
                 }
@@ -103,7 +104,7 @@ public class AnimationManager {
                 currentFrameTime = 0;
                 frameIndex++;
 
-                if (frameIndex >= currentAnimationSheet.getWidth() / Game.SPRITE_SIZE_PLAYER) {
+                if (frameIndex >= currentAnimationSheet.getWidth() / Settings.SPRITE_SIZE_PLAYER) {
                     frameIndex = 0;
                 }
             }

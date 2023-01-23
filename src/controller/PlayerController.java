@@ -2,8 +2,10 @@ package controller;
 
 import core.Position;
 import input.Input;
+import input.InputObserver;
 
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 
 public class PlayerController implements Controller {
 

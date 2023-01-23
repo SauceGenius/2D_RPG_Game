@@ -7,6 +7,7 @@ import core.Size;
 import display.Camera;
 import display.CursorManager;
 import display.ui.UI;
+import display.ui.UIManager;
 import entity.GameObject;
 import entity.GameObjectID;
 import entity.NPC;
@@ -25,7 +26,7 @@ import java.util.stream.Collectors;
 public abstract class State {
 
     protected Log log;
-    protected ArrayList<UI> uis;
+    protected UIManager uiManager;
     protected AudioPlayer audioPlayer;
     protected GameMap gameMap;
     protected List<GameObject> gameObjects;
@@ -39,9 +40,9 @@ public abstract class State {
     protected CursorManager cursorManager;
 
     public State(Size windowSize, Input input, Character character, Player player, AudioPlayer audioPlayer, SpriteLibrary spriteLibrary, Log log, CursorManager cursorManager) {
+        camera = new Camera(windowSize);
         this.log = log;
         this.audioPlayer = audioPlayer;
-        camera = new Camera(windowSize);
         this.input = input;
         this.character = character;
         this.player = player;

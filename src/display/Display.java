@@ -2,6 +2,7 @@ package display;
 
 import core.Log;
 import display.ui.UI;
+import display.ui.UIManager;
 import entity.Player;
 import game.state.State;
 import input.Input;
@@ -20,7 +21,7 @@ public class Display extends JFrame {
     private int x = 20;
     private int y = 20;
 
-    public Display(int width, int height, Input input, Player player, Log log, ArrayList<UI> uis) {
+    public Display(int width, int height, Input input, Player player, Log log, UIManager uiManager) {
         this.log = log;
         ImageIcon icon = new ImageIcon("resources/official_wow_icon.png");
         setIconImage(icon.getImage());
@@ -28,7 +29,7 @@ public class Display extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setResizable(false);
 
-        this.renderer = new Renderer(player, log, uis);
+        this.renderer = new Renderer(player, log, uiManager);
 
         canvas = new Canvas();
         canvas.setPreferredSize(new Dimension(width, height));

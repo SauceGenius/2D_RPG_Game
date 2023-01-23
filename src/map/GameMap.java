@@ -4,6 +4,7 @@ import core.Position;
 import core.Size;
 import game.Game;
 import gfx.SpriteLibrary;
+import settings.Settings;
 
 import java.util.Arrays;
 
@@ -27,17 +28,17 @@ public class GameMap {
     }
 
     public int getWidth(){
-        return tiles.length * Game.SPRITE_SIZE_TILE;
+        return tiles.length * Settings.SPRITE_SIZE_TILE;
     }
 
     public int getHeight(){
-        return tiles[0].length * Game.SPRITE_SIZE_TILE;
+        return tiles[0].length * Settings.SPRITE_SIZE_TILE;
     }
 
     public Position getRandomPosition() {
         //top left quarter of the map
-        double x = Math.random() * tiles.length * Game.SPRITE_SIZE_TILE / 2 + 500;
-        double y = Math.random() * tiles[0].length * Game.SPRITE_SIZE_TILE / 2 + 500;
+        double x = Math.random() * tiles.length * Settings.SPRITE_SIZE_TILE / 2 + 500;
+        double y = Math.random() * tiles[0].length * Settings.SPRITE_SIZE_TILE / 2 + 500;
 
         return new Position(x, y);
     }

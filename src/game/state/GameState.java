@@ -7,6 +7,7 @@ import core.Position;
 import core.Size;
 import display.CursorManager;
 import display.ui.UI;
+import display.ui.UIManager;
 import entity.GameObject;
 import entity.GameObjectID;
 import entity.NPC;
@@ -17,6 +18,7 @@ import core.Time;
 import gfx.SpriteLibrary;
 import input.Input;
 import map.GameMap;
+import settings.Settings;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,13 +26,13 @@ import java.util.stream.Collectors;
 
 public class GameState extends State{
 
-    public GameState(Size windowSize, Input input, Character character, Player player, AudioPlayer audioPlayer, SpriteLibrary spriteLibrary, Log log, CursorManager cursorManager, ArrayList<UI> uis) {
+    public GameState(Size windowSize, Input input, Character character, Player player, AudioPlayer audioPlayer, SpriteLibrary spriteLibrary, Log log, CursorManager cursorManager, UIManager uiManager) {
         super(windowSize, input, character, player, audioPlayer, spriteLibrary, log, cursorManager);
         input.setCamera(camera);
         gameMap = new GameMap(new Size(200,200),spriteLibrary);
         initializeCharacters();
         audioPlayer.playMusic("ElwynnForest.wav");
-        this.uis = uis;
+        this.uiManager = uiManager;
     }
 
     @Override
@@ -40,7 +42,8 @@ public class GameState extends State{
         respawn();
         super.update();
         character.update();
-        for(UI ui: uis){ ui.update(audioPlayer);}
+
+        for(UI ui: uiManager.getUiList()){ ui.update(audioPlayer);}
         updateCursor();
     }
 
@@ -80,7 +83,7 @@ public class GameState extends State{
     }
 
     private void initializeCharacters() {
-        player.setPosition(new Position(5 * Game.SPRITE_SIZE_TILE, 5 * Game.SPRITE_SIZE_TILE));
+        player.setPosition(new Position(5 * Settings.SPRITE_SIZE_TILE, 5 * Settings.SPRITE_SIZE_TILE));
         gameObjects.add(player);
         camera.focusOn(player);
 

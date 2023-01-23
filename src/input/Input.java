@@ -4,10 +4,12 @@ import core.Position;
 import display.Camera;
 
 import java.awt.event.*;
+import java.util.ArrayList;
 
 public class Input implements KeyListener, MouseListener, MouseMotionListener {
 
     //Variables
+    private ArrayList<InputObserver> inputObservers;
     private Camera camera;
     private Position mousePosition;
     private boolean mouseClicked;
@@ -23,6 +25,7 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
     public Input(){
         pressed = new boolean[255];
         mousePosition = new Position(0,0);
+        inputObservers = new ArrayList<>();
     }
 
     //////////////// MOUSE ////////////////
@@ -64,6 +67,8 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
     //Methods
     @Override
     public void keyTyped(KeyEvent e) {
+        notifyKeyTyped(e);
+
         switch (e.getKeyChar()){
             case 'b':
                 if(inventoryIsOpen == false) {
@@ -97,6 +102,21 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
     public boolean isCharacterSheetOpen() {return characterSheetIsOpen;}
     public boolean isAddingItem() {return addingItem;}
     public boolean isLooting() {return looting;}
+
+
+    public void addInputObserver(InputObserver inputObserver){
+        inputObservers.add(inputObserver);
+    }
+
+    public void removeInputObserver(InputObserver inputObserver){
+        inputObservers.remove(inputObserver);
+    }
+
+    public void notifyKeyTyped(KeyEvent keyTyped){
+        for(InputObserver inputObserver: inputObservers){
+            inputObserver.notifyKeyPressed(keyTyped);
+        }
+    }
 
     //Setters
     public void setAddingItem(boolean addingItem) {this.addingItem = addingItem;}
