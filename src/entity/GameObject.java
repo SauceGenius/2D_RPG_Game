@@ -73,6 +73,6 @@ public abstract class GameObject {
     public abstract CollisionBox getDetectionBox();
     public abstract boolean collidesWith(GameObject other);
     public abstract boolean attackCollidesWith(GameObject other);
-    public abstract boolean clickCollidesWith(GameObject other);
+    public abstract boolean mouseCollidesWith(GameObject other);
     public abstract boolean detectionCollidesWith(GameObject gameObject);
 }

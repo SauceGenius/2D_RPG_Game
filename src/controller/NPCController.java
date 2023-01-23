@@ -29,10 +29,10 @@ public class NPCController implements Controller{
         return right;
     }
 
-    @Override
+    /*@Override
     public boolean isRequestingAttack() {
         return false;
-    }
+    }*/
     public boolean isRequestingSprint() {
         return false;
     }

@@ -5,7 +5,10 @@ import controller.NPCController;
 import core.Log;
 import core.Position;
 import core.Size;
+import display.CursorManager;
 import display.ui.UI;
+import entity.GameObject;
+import entity.GameObjectID;
 import entity.NPC;
 import entity.Player;
 import entity.character.Character;
@@ -16,33 +19,18 @@ import input.Input;
 import map.GameMap;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class GameState extends State{
 
-    public GameState(Size windowSize, Input input, Character character, Player player, AudioPlayer audioPlayer, SpriteLibrary spriteLibrary, Log log, ArrayList<UI> uis) {
-        super(windowSize, input, character, player, audioPlayer, spriteLibrary, log);
+    public GameState(Size windowSize, Input input, Character character, Player player, AudioPlayer audioPlayer, SpriteLibrary spriteLibrary, Log log, CursorManager cursorManager, ArrayList<UI> uis) {
+        super(windowSize, input, character, player, audioPlayer, spriteLibrary, log, cursorManager);
         input.setCamera(camera);
         gameMap = new GameMap(new Size(200,200),spriteLibrary);
         initializeCharacters();
-        this.uis = uis;
-
         audioPlayer.playMusic("ElwynnForest.wav");
-    }
-
-    private void initializeCharacters() {
-        player.setPosition(new Position(5 * Game.SPRITE_SIZE_TILE, 5 * Game.SPRITE_SIZE_TILE));
-        gameObjects.add(player);
-        camera.focusOn(player);
-
-        initializeNPCs(5);
-    }
-
-    private void initializeNPCs(int numberOfNPCs) {
-        for(int i = 0; i < numberOfNPCs; i++){
-            NPC npc = new NPC(new NPCController(), audioPlayer, spriteLibrary, log);
-            npc.setPosition(getGameMap().getRandomPosition());
-            gameObjects.add(npc);
-        }
+        this.uis = uis;
     }
 
     @Override
@@ -52,9 +40,8 @@ public class GameState extends State{
         respawn();
         super.update();
         character.update();
-        for(UI ui: uis){
-            ui.update(audioPlayer);
-        }
+        for(UI ui: uis){ ui.update(audioPlayer);}
+        updateCursor();
     }
 
     @Override
@@ -65,6 +52,11 @@ public class GameState extends State{
 
         //always last
         input.clearMouseClicked();
+    }
+
+    public void updateCursor(){
+        List<GameObject> mouseOverObjects = gameObjects.stream().filter(other -> player.mouseCollidesWith(other)).collect(Collectors.toList());
+        cursorManager.update(mouseOverObjects);
     }
 
     public void statusUpdate(){
@@ -84,6 +76,22 @@ public class GameState extends State{
                 npc.setPosition(getGameMap().getRandomPosition());
                 gameObjects.add(npc);
             }
+        }
+    }
+
+    private void initializeCharacters() {
+        player.setPosition(new Position(5 * Game.SPRITE_SIZE_TILE, 5 * Game.SPRITE_SIZE_TILE));
+        gameObjects.add(player);
+        camera.focusOn(player);
+
+        initializeNPCs(5);
+    }
+
+    private void initializeNPCs(int numberOfNPCs) {
+        for(int i = 0; i < numberOfNPCs; i++){
+            NPC npc = new NPC(new NPCController(), audioPlayer, spriteLibrary, log);
+            npc.setPosition(getGameMap().getRandomPosition());
+            gameObjects.add(npc);
         }
     }
 }

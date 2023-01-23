@@ -13,11 +13,11 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
     private boolean mouseClicked;
     private boolean mousePressed;
     private boolean[] pressed;
-    private boolean attackRequested = false;
     private boolean inventoryIsOpen = false;
     private boolean characterSheetIsOpen = false;
     private boolean addingItem = false;
     private boolean looting = false;
+    /*private boolean attackRequested = false;*/
 
     //Constructor
     public Input(){
@@ -42,10 +42,13 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
 
     @Override
     public void mouseEntered(MouseEvent e) {}
+
     @Override
     public void mouseExited(MouseEvent e) {}
+
     @Override
     public void mouseDragged(MouseEvent e) {mousePosition = new Position(e.getPoint().getX() + camera.getPosition().getX(), e.getPoint().getY() + camera.getPosition().getY());}
+
     @Override
     public void mouseMoved(MouseEvent e) {mousePosition = new Position(e.getPoint().getX() + camera.getPosition().getX(), e.getPoint().getY() + camera.getPosition().getY());}
 
@@ -83,40 +86,29 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
     }
 
     @Override
-    public void keyPressed(KeyEvent e) {
-        pressed[e.getKeyCode()] = true;
-    }
+    public void keyPressed(KeyEvent e) {pressed[e.getKeyCode()] = true;}
 
     @Override
-    public void keyReleased(KeyEvent e) {pressed[e.getKeyCode()] = false;
-    }
+    public void keyReleased(KeyEvent e) {pressed[e.getKeyCode()] = false;}
 
-    public boolean isPressed(int keyCode) {
-        return pressed[keyCode];
-    }
-    public boolean isInventoryOpen() {
-        return inventoryIsOpen;
-    }
+    //Getters
+    public boolean isPressed(int keyCode) {return pressed[keyCode];}
+    public boolean isInventoryOpen() {return inventoryIsOpen;}
     public boolean isCharacterSheetOpen() {return characterSheetIsOpen;}
-    public boolean isAddingItem() {
-        return addingItem;
-    }
+    public boolean isAddingItem() {return addingItem;}
     public boolean isLooting() {return looting;}
-    public void setAddingItem(boolean addingItem) {
-        this.addingItem = addingItem;
-    }
+
+    //Setters
+    public void setAddingItem(boolean addingItem) {this.addingItem = addingItem;}
     public void setLooting(boolean looting) {this.looting = looting;}
+    public void setCamera(Camera camera) {this.camera = camera;}
 
-    public void setAttackRequested(boolean attackRequested) {
+    /*public void setAttackRequested(boolean attackRequested) {
         this.attackRequested = attackRequested;
-    }
+    }*/
 
-    public boolean isAttackRequested() {
+    /*public boolean isAttackRequested() {
         return attackRequested;
-    }
-
-    public void setCamera(Camera camera) {
-        this.camera = camera;
-    }
+    }*/
 }
 

@@ -7,6 +7,7 @@ import controller.Controller;
 import controller.NPCController;
 import controller.PlayerController;
 import core.Log;
+import display.CursorManager;
 import entity.item.Item;
 import entity.item.ItemId;
 import entity.item.OneHandWeapon;
@@ -144,8 +145,9 @@ public class NPC extends MovingEntity {
     }
 
     @Override
-    protected void handleClickCollisions(GameObject other) {
+    protected void handleMouseCollisions(GameObject other) {
         if(other instanceof Player){
+
             Player player = (Player) other;
             if(player.getPlayerController().isClicking() && this != player.getTarget()){
                 player.setTarget((MovingEntity) this);
@@ -192,7 +194,7 @@ public class NPC extends MovingEntity {
 
     //Always false
     @Override
-    public boolean clickCollidesWith(GameObject other) {return false;}
+    public boolean mouseCollidesWith(GameObject other) {return false;}
     @Override
     public boolean detectionCollidesWith(GameObject other) {return false;}
     @Override

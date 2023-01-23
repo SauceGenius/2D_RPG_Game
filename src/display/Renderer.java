@@ -32,7 +32,6 @@ public class Renderer {
     }
 
     public void render(State state, Graphics graphics) {
-        Camera camera = state.getCamera();
         renderMap(state, graphics);
 
         renderTargetCircle(state, graphics);

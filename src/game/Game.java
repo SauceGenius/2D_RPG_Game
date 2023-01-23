@@ -3,6 +3,7 @@ package game;
 import audio.AudioPlayer;
 import core.Log;
 import core.Size;
+import display.CursorManager;
 import display.Display;
 import display.ui.InventoryUI;
 import display.ui.LogBoxUI;
@@ -39,7 +40,8 @@ public class Game {
         uis.add(new LogBoxUI());
         uis.add(new InventoryUI(player.getInventory(), player.getPlayerController()));
         display = new Display(Settings.WINDOW_WIDTH, Settings.WINDOW_HEIGHT, input, player, log, uis);
-        state = new GameState(new Size(Settings.WINDOW_WIDTH, Settings.WINDOW_HEIGHT), input, character, player, audioPlayer, spriteLibrary, log, uis);
+        CursorManager cursorManager = new CursorManager(display);
+        state = new GameState(new Size(Settings.WINDOW_WIDTH, Settings.WINDOW_HEIGHT), input, character, player, audioPlayer, spriteLibrary, log, cursorManager, uis);
     }
 
     public void update(){

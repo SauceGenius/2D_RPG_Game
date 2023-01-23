@@ -23,13 +23,13 @@ public class Motion {
         int deltaX = 0;
         int deltaY = 0;
 
-        if (controller.isRequestingAttack()) {
+        /*if (controller.isRequestingAttack()) {
             isAttacking = true;
             deltaX = 0;
             deltaY = 0;
         } else {
             isAttacking = false;
-        }
+        }*/
 
         if(isAttacking == false) {
             if (controller.isRequestingUp()) {

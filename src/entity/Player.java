@@ -5,6 +5,7 @@ import controller.Controller;
 import controller.PlayerController;
 import core.CollisionBox;
 import core.Log;
+import display.CursorManager;
 import entity.stats.Stats;
 import core.Timer;
 import game.state.State;
@@ -143,7 +144,7 @@ public class Player extends MovingEntity {
     }
 
     @Override
-    public boolean clickCollidesWith(GameObject other) {
+    public boolean mouseCollidesWith(GameObject other) {
         CollisionBox pointer = new CollisionBox(new Rectangle(playerController.getMousePosition().intX() - 10, playerController.getMousePosition().intY() - 10, 20, 20));
         return pointer.collidesWith(other.getHitBox());
     }
@@ -157,7 +158,7 @@ public class Player extends MovingEntity {
     protected void handleInteractionCollisions(GameObject other) {}
 
     @Override
-    protected void handleClickCollisions(GameObject other) {}
+    protected void handleMouseCollisions(GameObject other) {}
 
     @Override
     protected void handleDetectionCollisions(GameObject otherGameObject) {}

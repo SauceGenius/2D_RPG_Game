@@ -56,40 +56,20 @@ public abstract class MovingEntity extends GameObject{
     }
 
     protected abstract void decideAnimation();
+
     protected abstract void dies() ;
 
     @Override
     public CollisionBox getCollisionBox() {
-        return new CollisionBox(
-                new Rectangle(
-                        position.intX() + 10,
-                        position.intY() + Game.SPRITE_SIZE_PLAYER/2 - 4,
-                        size.getWidth()/2,
-                        size.getHeight()/4 + 4
-                )
-        );
+        return new CollisionBox(new Rectangle(position.intX() + 10, position.intY() + Game.SPRITE_SIZE_PLAYER/2 - 4, size.getWidth()/2, size.getHeight()/4 + 4));
     }
 
     public CollisionBox getHitBox(){
-        return new CollisionBox(
-                new Rectangle(
-                        position.intX(),
-                        position.intY(),
-                        size.getWidth(),
-                        size.getHeight()
-                )
-        );
+        return new CollisionBox(new Rectangle(position.intX(), position.intY(), size.getWidth(), size.getHeight()));
     }
 
     public CollisionBox getDetectionBox(){
-        return new CollisionBox(
-                new Rectangle(
-                        position.intX() - 250,
-                        position.intY() - 250,
-                        size.getWidth() + 500,
-                        size.getHeight() + 500
-                )
-        );
+        return new CollisionBox(new Rectangle(position.intX() - 250, position.intY() - 250, size.getWidth() + 500, size.getHeight() + 500));
     }
 
     @Override
@@ -100,14 +80,13 @@ public abstract class MovingEntity extends GameObject{
     private void handleCollisions(State state) {
         state.getCollidingObjects(this).forEach(this::handleCollisions);
         state.getAttackedObjects(this).forEach(this::handleInteractionCollisions);
-        state.getClickedObjects(this).forEach(this::handleClickCollisions);
+        state.getClickedObjects(this).forEach(this::handleMouseCollisions);
         state.getDetectedObjects(this).forEach(this::handleDetectionCollisions);
     }
 
     protected abstract void handleCollisions(GameObject other);
-
     protected abstract void handleInteractionCollisions(GameObject other);
-    protected abstract void handleClickCollisions(GameObject other);
+    protected abstract void handleMouseCollisions(GameObject other);
     protected abstract void handleDetectionCollisions(GameObject gameObject);
 
 

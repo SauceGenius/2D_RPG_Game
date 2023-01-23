@@ -34,34 +34,15 @@ public class PlayerController implements Controller {
     }
 
     @Override
-    public boolean isRequestingAttack() {
-        if(input.isAttackRequested()){
-            input.setAttackRequested(false);
-            return true;
-        }
-        else return false;
-    }
-
-    public void attackDone(boolean attackDone){
-        if(attackDone){
-            this.input.setAttackRequested(false);
-        }
-        else {
-            this.input.setAttackRequested(true);
-        }
-    }
-
-    @Override
     public boolean isRequestingSprint() {return input.isPressed(KeyEvent.VK_SHIFT);}
 
     public boolean isClicking() {return input.isMouseClicked();}
 
-    public boolean isInventoryOpen() {
-        return input.isInventoryOpen();}
+    public boolean isInventoryOpen() {return input.isInventoryOpen();}
 
-    public boolean isCharacterSheetOpen() {
-        return input.isCharacterSheetOpen();}
+    public boolean isCharacterSheetOpen() {return input.isCharacterSheetOpen();}
 
+    public Position getMousePosition(){ return input.getMousePosition();}
 
     public boolean isAddingItem() {
         if(input.isAddingItem() == true){
@@ -77,9 +58,5 @@ public class PlayerController implements Controller {
             return true;} else{
             return false;
         }
-    }
-
-    public Position getMousePosition(){
-        return input.getMousePosition();
     }
 }

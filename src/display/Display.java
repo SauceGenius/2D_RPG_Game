@@ -36,12 +36,6 @@ public class Display extends JFrame {
         canvas.addMouseListener(input);
         canvas.addMouseMotionListener(input);
 
-        // Default Cursor
-        Toolkit toolkit = Toolkit.getDefaultToolkit();
-        Image image = toolkit.getImage("resources/sprites/ui/MouseCursor.png");
-        Cursor cursor = toolkit.createCustomCursor(image,new Point(0,0),"Game Cursor");
-        setCursor(cursor);
-
         add(canvas);
         addKeyListener(input);
 
