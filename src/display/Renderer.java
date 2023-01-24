@@ -22,6 +22,9 @@ import java.util.ArrayList;
 
 public class Renderer {
 
+    //For testing
+    private boolean devKitEnabled = false;
+
     private Log log;
     private Player player;
     private UIManager uiManager;
@@ -43,7 +46,7 @@ public class Renderer {
         renderInteractionOption(state, graphics);
         uiManager.render(graphics);
 
-        //renderDevKit(state, graphics);
+        if(devKitEnabled) renderDevKit(state, graphics);
     }
 
     private void renderMap(State state, Graphics graphics) {
@@ -252,7 +255,7 @@ public class Renderer {
         }
     }
 
-    
+
     // Dev mode //
     private void renderDevKit(State state, Graphics graphics) {
         Camera camera = state.getCamera();

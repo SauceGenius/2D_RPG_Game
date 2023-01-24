@@ -16,48 +16,23 @@ public class PlayerController implements Controller {
     }
 
     @Override
-    public boolean isRequestingUp() {
-        return input.isPressed(KeyEvent.VK_W);
-    }
+    public boolean isRequestingUp() {return input.isPressed(KeyEvent.VK_W);}
 
     @Override
-    public boolean isRequestingDown() {
-        return input.isPressed(KeyEvent.VK_S);
-    }
+    public boolean isRequestingDown() {return input.isPressed(KeyEvent.VK_S);}
 
     @Override
-    public boolean isRequestingLeft() {
-        return input.isPressed(KeyEvent.VK_A);
-    }
+    public boolean isRequestingLeft() {return input.isPressed(KeyEvent.VK_A);}
 
     @Override
-    public boolean isRequestingRight() {
-        return input.isPressed(KeyEvent.VK_D);
-    }
+    public boolean isRequestingRight() {return input.isPressed(KeyEvent.VK_D);}
 
     @Override
     public boolean isRequestingSprint() {return input.isPressed(KeyEvent.VK_SHIFT);}
 
     public boolean isClicking() {return input.isMouseClicked();}
 
-    public boolean isRightClicking(){return input.isMouseRightClicked();}
+    public boolean isRightClicking() {return input.isMouseRightClicked();}
 
-
-    public Position getMousePosition(){ return input.getMousePosition();}
-
-    public boolean isAddingItem() {
-        if(input.isAddingItem() == true){
-            this.input.setAddingItem(false);
-            return true;} else{
-            return false;
-        }
-    }
-
-    public boolean isRequestingLoot() {
-        if(input.isLooting() == true){
-            this.input.setLooting(false);
-            return true;} else{
-            return false;
-        }
-    }
+    public Position getMousePosition() {return input.getMousePosition();}
 }

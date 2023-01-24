@@ -132,14 +132,6 @@ public class NPC extends MovingEntity {
                     }
                 }
             }
-
-            //Looting
-            if(status.isDead() && status.hasBeenLooted() == false) {
-                PlayerController playerController = player.getPlayerController();
-                if(playerController.isRequestingLoot()) {
-                    player.loots(this);
-                }
-            }
         }
     }
 
