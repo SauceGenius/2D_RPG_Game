@@ -7,7 +7,6 @@ import controller.Controller;
 import controller.NPCController;
 import controller.PlayerController;
 import core.Log;
-import display.CursorManager;
 import entity.item.Item;
 import entity.item.ItemId;
 import entity.item.OneHandWeapon;
@@ -145,28 +144,23 @@ public class NPC extends MovingEntity {
     }
 
     @Override
-    protected void handleMouseCollisions(GameObject other) {
-        if(other instanceof Player){
-
-            Player player = (Player) other;
-            if(player.getPlayerController().isClicking() && this != player.getTarget()){
-                player.setTarget((MovingEntity) this);
-                audioPlayer.playSound("SelectTarget.wav");
-                player.status.setInCombat(true);
-            }
-        }
-    }
+    protected void handleMouseCollisions(GameObject other){}
 
     @Override
     protected void handleDetectionCollisions(GameObject otherGameObject) {
         if(!isDead()){
-            if (otherGameObject instanceof Player){
-                if (((Player) otherGameObject).getTarget() == null){
-                    ((Player) otherGameObject).setTarget(this);
-                     otherGameObject.status.setInCombat(true);
-                }
-                getAiManager().setCurrentAIState(new Aggressive((Player)otherGameObject));
+            if(otherGameObject instanceof Player){
+                this.aggroes((Player)otherGameObject);
             }
+        }
+    }
+
+    public void aggroes(Player player){
+        if(!status.isInCombat()){
+            status.setInCombat(true);
+            getAiManager().setCurrentAIState(new Aggressive(player));
+            audioPlayer.playSound("MaleOgreAggro.wav");
+            player.aggroed(this);
         }
     }
 

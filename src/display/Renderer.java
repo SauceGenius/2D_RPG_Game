@@ -35,15 +35,13 @@ public class Renderer {
 
     public void render(State state, Graphics graphics) {
         renderMap(state, graphics);
-
         renderTargetCircle(state, graphics);
         renderGameObjects(state, graphics);
         renderNamePlates(state, graphics);
         renderHealthBar(state, graphics);
         renderFloatingCombatText(state, graphics);
         renderInteractionOption(state, graphics);
-
-        renderUI(state, graphics);
+        uiManager.render(graphics);
 
         //renderDevKit(state, graphics);
     }
@@ -131,9 +129,9 @@ public class Renderer {
 
                 if(tempObject.isDead()) {
                     graphics.setColor(Color.gray);
-                } else {
-                    graphics.setColor(Color.yellow);
-                }
+                } else if(player.getStatus().isInCombat() && tempObject == player.getTarget()){
+                    graphics.setColor(Color.orange);
+                } else graphics.setColor(Color.yellow);
 
                 //NPC Name
                 graphics.drawString(tempObject.getName(), x, y);
@@ -254,219 +252,7 @@ public class Renderer {
         }
     }
 
-    // UI //
-    private void renderUI(State state, Graphics graphics) {
-        renderEquipment(graphics);
-        renderUnitFrames(state, graphics);
-        renderExpBar(graphics);
-        renderSpellBar(graphics);
-
-        /*
-        LogBoxUI logBoxUI = (LogBoxUI) uis.get(0);
-        logBoxUI.render(graphics, log);
-        InventoryUI bagUI = (InventoryUI) uis.get(1);
-        bagUI.render(graphics);
-        */
-
-        uiManager.render(graphics);
-    }
-
-    private void renderEquipment(Graphics graphics) {
-        if (player.getEquipment().isOpen())
-        {
-            Position equipmentPosition = new Position(20,200);
-            Size equipmentSize = new Size(310, 390);
-
-            //Background
-            graphics.setColor(new Color(70, 70, 70));
-            graphics.fillRect(equipmentPosition.intX(), equipmentPosition.intY(), equipmentSize.getWidth(), equipmentSize.getHeight());
-            graphics.setColor(new Color(0, 0, 0));
-            graphics.drawRect(equipmentPosition.intX(), equipmentPosition.intY(), equipmentSize.getWidth(), equipmentSize.getHeight());
-
-            //Equipment top
-            graphics.setColor(new Color(70, 70, 70));
-            graphics.fillRect( equipmentPosition.intX() + 37, equipmentPosition.intY() + 5, equipmentSize.getWidth() - 72, 19);
-            graphics.setColor(Color.black);
-            graphics.drawRect(equipmentPosition.intX() + 37, equipmentPosition.intY() + 5, equipmentSize.getWidth() - 72, 19);
-
-            graphics.setColor(Color.white);
-            graphics.setFont(new Font("TimesRoman", Font.BOLD, 12));
-            graphics.drawString(player.getName(),  equipmentPosition.intX() + 120, equipmentPosition.intY() + 18);
-            graphics.setColor(Color.yellow);
-            graphics.setFont(new Font("TimesRoman", Font.BOLD, 11));
-            graphics.drawString("Level " + player.getLevel() + " Human Warrior",  equipmentPosition.intX() + 100, equipmentPosition.intY() + 36);
-
-            //Stats name
-            graphics.setColor(Color.yellow);
-            graphics.setFont(new Font("TimesRoman", Font.BOLD, 11));
-            graphics.drawString("Strength: ",equipmentPosition.intX() + 50, equipmentPosition.intY() + 270);
-            graphics.drawString("Agility: ",equipmentPosition.intX() + 50, equipmentPosition.intY() + 284);
-            graphics.drawString("Stamina: ",equipmentPosition.intX() + 50, equipmentPosition.intY() + 298);
-            graphics.drawString("Intellect:  ",equipmentPosition.intX() + 50, equipmentPosition.intY() + 312);
-            graphics.drawString("Spirit: ",equipmentPosition.intX() + 50, equipmentPosition.intY() + 326);
-            graphics.drawString("Armor: ",equipmentPosition.intX() + 50, equipmentPosition.intY() + 340);
-
-            graphics.drawString("Melee Attack: ",equipmentPosition.intX() + 160, equipmentPosition.intY() + 270);
-            graphics.drawString("Power: ",equipmentPosition.intX() + 164, equipmentPosition.intY() + 284);
-            graphics.drawString("Damage: ",equipmentPosition.intX() + 164, equipmentPosition.intY() + 298);
-
-            //Stats value
-            graphics.setColor(Color.white);
-            graphics.setFont(new Font("TimesRoman", Font.BOLD, 11));
-            graphics.drawString(Integer.toString(player.getStats().getStat("strength")),equipmentPosition.intX() + 135, equipmentPosition.intY() + 270);
-            graphics.drawString(Integer.toString(player.getStats().getStat("agility")),equipmentPosition.intX() + 135, equipmentPosition.intY() + 284);
-            graphics.drawString(Integer.toString(player.getStats().getStat("stamina")),equipmentPosition.intX() + 135, equipmentPosition.intY() + 298);
-            graphics.drawString(Integer.toString(player.getStats().getStat("intellect")),equipmentPosition.intX() + 135, equipmentPosition.intY() + 312);
-            graphics.drawString(Integer.toString(player.getStats().getStat("spirit")),equipmentPosition.intX() + 135, equipmentPosition.intY() + 326);
-            graphics.drawString(Integer.toString(player.getStats().getArmor()),equipmentPosition.intX() + 135, equipmentPosition.intY() + 340);
-
-            graphics.drawString("Skill",equipmentPosition.intX() + 245, equipmentPosition.intY() + 270);
-            graphics.drawString(Long.toString(Math.round(player.getStats().getMeleeAttackPower())),equipmentPosition.intX() + 255, equipmentPosition.intY() + 284);
-            graphics.drawString((int)(player.getStats().getMinMeleeWeaponDamage() + player.getStats().getMeleeAttackPower()/14*player.getStats().getAttackSpeed()) +
-                            " - " + Math.round(player.getStats().getMaxMeleeWeaponDamage() + player.getStats().getMeleeAttackPower()/14*player.getStats().getAttackSpeed())
-                    ,equipmentPosition.intX() + 245, equipmentPosition.intY() + 298);
-
-            // Each space
-            for (int x = 0; x < 2; x++) {
-                for (int y = 0; y < 8; y++) {
-                    graphics.setColor(new Color(70, 70, 70));
-                    graphics.fillRect(x * 268 + equipmentPosition.intX() + 5, y * 36 + equipmentPosition.intY() + 70, 32, 32);
-                    graphics.setColor(new Color(0, 0, 0));
-                    graphics.drawRect(x * 268 + equipmentPosition.intX() + 5, y * 36 + equipmentPosition.intY() + 70, 32, 32);
-                    graphics.setColor(Color.white);
-                    graphics.drawString(Integer.toString(x + y * 2 + 3), x * 268 + equipmentPosition.intX()+ 5, y * 36 + equipmentPosition.intY() + 102);
-                    if (player.getEquipment().getEquipment()[(x + y * 2 + 3)] != null) {
-                        graphics.drawImage(player.getEquipment().getItem(x + y * 2 + 3).getIconSprite(), x * 268 + equipmentPosition.intX() + 5, y * 32 + equipmentPosition.intY() + 70, null);
-                    }
-                }
-            }
-
-            graphics.setColor(new Color(70, 70, 70));
-            graphics.fillRect(equipmentPosition.intX() + 100, equipmentPosition.intY() + 350, 32, 32);
-            graphics.setColor(new Color(0, 0, 0));
-            graphics.drawRect(equipmentPosition.intX() + 100, equipmentPosition.intY() + 350, 32, 32);
-            graphics.drawRect(equipmentPosition.intX() + 136, equipmentPosition.intY() + 350, 32, 32);
-            graphics.drawRect(equipmentPosition.intX() + 172, equipmentPosition.intY() + 350, 32, 32);
-            if(player.getEquipment().getItem(0) != null){
-                graphics.drawImage(player.getEquipment().getItem(0).getIconSprite(), equipmentPosition.intX() + 100, equipmentPosition.intY() + 350, null);
-            }
-            if(player.getEquipment().getItem(1) != null){
-                graphics.drawImage(player.getEquipment().getItem(0).getIconSprite(), equipmentPosition.intX() + 134, equipmentPosition.intY() + 350, null);
-            }
-            if(player.getEquipment().getItem(2) != null){
-                graphics.drawImage(player.getEquipment().getItem(0).getIconSprite(), equipmentPosition.intX() + 138, equipmentPosition.intY() + 350, null);
-            }
-        }
-    }
-
-    private void renderUnitFrames(State state, Graphics graphics) {
-        int x = 20; int y = 30; int w = 150; int h = 10;
-        graphics.setFont(new Font("TimesRoman", Font.BOLD, 11));
-
-        //Player
-        graphics.setColor(new Color(70,70,70, 150));
-        graphics.fillArc(x,y - 10,60,60,360,360);
-        graphics.setColor(Color.black);
-        graphics.drawArc(x,y - 10,60,60,360,360);
-        graphics.setColor(new Color(70,70,70,150));
-        graphics.fillRect(x + 60,y,w,40);
-        graphics.setColor(Color.yellow);
-        graphics.drawString(player.getName(), x + 100, y + 14);
-        graphics.setColor(Color.green);
-        graphics.fillRect(x + 60,y + 20,(int)(player.getStats().getCurrentHpValue()/player.getStats().getMaxHpValue() * w), h);
-        graphics.setColor(Color.black);
-        graphics.drawRect(x + 60,y,w,40);
-        graphics.drawRect(x + 60,y + 20,w,10);
-        graphics.setColor(Color.black);
-        graphics.drawString(Integer.toString((int)player.getCurrentHpValue()).concat(" / ").concat(Integer.toString((int)player.getMaxHpValue())),60 + 79,y + 29);
-        graphics.drawString(Integer.toString((int)player.getCurrentHpValue()).concat(" / ").concat(Integer.toString((int)player.getMaxHpValue())),60 + 81,y + 29);
-        graphics.drawString(Integer.toString((int)player.getCurrentHpValue()).concat(" / ").concat(Integer.toString((int)player.getMaxHpValue())),60 + 79,y + 31);
-        graphics.drawString(Integer.toString((int)player.getCurrentHpValue()).concat(" / ").concat(Integer.toString((int)player.getMaxHpValue())),60 + 81,y + 31);
-        graphics.setColor(Color.white);
-        graphics.drawString(Integer.toString((int)player.getCurrentHpValue()).concat(" / ").concat(Integer.toString((int)player.getMaxHpValue())),60 + 80,y + 30);
-
-        BufferedImage bufferedImage = (BufferedImage) state.getSpriteLibrary().getUnit("player").get("Idle");
-        graphics.drawImage(bufferedImage.getSubimage(15,298,96,48).getScaledInstance(127,64,1),x - 10,y - 14,null);
-
-        graphics.setColor(new Color(70,70,70, 230));
-        graphics.fillArc(x,y + 30,20,20,360,360);
-        graphics.setColor(Color.black);
-        graphics.drawArc(x,y + 30,20,20,360,360);
-        graphics.setColor(Color.yellow);
-        graphics.drawString(Integer.toString(player.getLevel()), x + 8, y + 45);;
-
-        //Target
-        if(player.getTarget() != null){
-            graphics.setColor(new Color(70,70,70,150));
-            graphics.fillRect(x + w + 120,y,w,40);
-            graphics.setColor(Color.yellow);
-            graphics.drawString(player.getTarget().getName(), x + w + 180, y + 14);
-            graphics.setColor(Color.green);
-            graphics.fillRect(x + w + 120,y + 20,(int)(player.getTarget().getStats().getCurrentHpValue()/player.getTarget().getStats().getMaxHpValue() * w), h);
-            graphics.setColor(Color.black);
-            graphics.drawRect(x + w + 120,y,w,40);
-            graphics.drawRect(x + w + 120,y + 20,w,10);
-            if(!player.getTarget().isDead()) {
-                graphics.setColor(Color.black);
-                graphics.drawString(Integer.toString((int)player.getTarget().getCurrentHpValue()).concat(" / ").concat(Integer.toString((int)player.getTarget().getMaxHpValue())),x + w + 179,y + 29);
-                graphics.drawString(Integer.toString((int)player.getTarget().getCurrentHpValue()).concat(" / ").concat(Integer.toString((int)player.getTarget().getMaxHpValue())),x + w + 179,y + 31);
-                graphics.drawString(Integer.toString((int)player.getTarget().getCurrentHpValue()).concat(" / ").concat(Integer.toString((int)player.getTarget().getMaxHpValue())),x + w + 181,y + 29);
-                graphics.drawString(Integer.toString((int)player.getTarget().getCurrentHpValue()).concat(" / ").concat(Integer.toString((int)player.getTarget().getMaxHpValue())),x + w + 181,y + 31);
-                graphics.setColor(Color.white);
-                graphics.drawString(Integer.toString((int)player.getTarget().getCurrentHpValue()).concat(" / ").concat(Integer.toString((int)player.getTarget().getMaxHpValue())),x + w + 180,y + 30);
-            } else {
-                graphics.setColor(Color.black);
-                graphics.drawString("Dead",x + w + 179,y + 29);
-                graphics.drawString("Dead",x + w + 179,y + 31);
-                graphics.drawString("Dead",x + w + 181,y + 29);
-                graphics.drawString("Dead",x + w + 181,y + 31);
-                graphics.setColor(Color.yellow);
-                graphics.drawString("Dead",x + w + 180,y + 30);
-            }
-
-            graphics.setColor(new Color(70,70,70, 150));
-            graphics.fillArc(x + 421,y - 10,60,60,360,360);
-            graphics.setColor(Color.black);
-            graphics.drawArc(x + 421,y - 10,60,60,360,360);
-            graphics.setColor(new Color(70,70,70, 230));
-            graphics.fillArc(x + 461,y + 30,20,20,360,360);
-            graphics.setColor(Color.black);
-            graphics.drawArc(x + 461,y + 30,20,20,360,360);
-            graphics.setColor(Color.yellow);
-            graphics.drawString(Integer.toString(player.getTarget().getLevel()), x + 469, y + 45);
-        }
-    }
-
-    private void renderExpBar(Graphics graphics) {
-        int x = 600; int y = 1000; int w = 800; int h = 10;
-        graphics.setColor(new Color(70,70,70,150));
-        graphics.fillRect(x, y, w, h);
-
-        graphics.setColor(new Color(90,0,140));
-        graphics.fillRect(x, y, (int)((double)player.getExp()/(double)player.getExpToNextLevel() * w), h);
-
-        graphics.setColor(Color.black);
-        graphics.drawRect(x, y, w, h);
-        for (int i = 0; i < 20; i++){
-            graphics.drawRect(x + i * 40, y, 40,h);
-        }
-        graphics.setFont(new Font("TimesRoman", Font.BOLD,12));
-    }
-
-    private void renderSpellBar(Graphics graphics) {
-        int x = 600; int y = 1012; int w = 410; int h = 36;
-        graphics.setColor(new Color(70,70,70));
-        graphics.fillRect(x,y,w,h);
-        graphics.setColor(Color.black);
-        for(int i = 0; i < 12; i++){
-            graphics.drawRect(x + i * 34 + 2, y + 2, 32, 32);
-        }
-        graphics.drawRect(x,y,w,h);
-
-        graphics.setColor(new Color(60,60,60, 150));
-        graphics.fillRect(x + 3, y + 3, (int)(31 * player.getAutoAttackTimer().getUpdatesCountDown() / (player.getStats().getAttackSpeed() * 60)), 31);
-    }
-
+    
     // Dev mode //
     private void renderDevKit(State state, Graphics graphics) {
         Camera camera = state.getCamera();

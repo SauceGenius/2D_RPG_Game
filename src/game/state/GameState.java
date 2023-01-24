@@ -8,23 +8,18 @@ import core.Size;
 import display.CursorManager;
 import display.ui.UI;
 import display.ui.UIManager;
-import entity.GameObject;
-import entity.GameObjectID;
 import entity.NPC;
 import entity.Player;
 import entity.character.Character;
-import game.Game;
 import core.Time;
 import gfx.SpriteLibrary;
 import input.Input;
 import map.GameMap;
 import settings.Settings;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.stream.Collectors;
 
-public class GameState extends State{
+public class GameState extends State {
 
     public GameState(Size windowSize, Input input, Character character, Player player, AudioPlayer audioPlayer, SpriteLibrary spriteLibrary, Log log, CursorManager cursorManager, UIManager uiManager) {
         super(windowSize, input, character, player, audioPlayer, spriteLibrary, log, cursorManager);
@@ -38,28 +33,21 @@ public class GameState extends State{
     @Override
     public void update() {
         statusUpdate();
-        if(player.getTarget() != null && player.getTarget().hasBeenLooted())player.setTarget(null);
         respawn();
         super.update();
         character.update();
 
-        for(UI ui: uiManager.getUiList()){ ui.update(audioPlayer);}
-        updateCursor();
+        for(UI ui: uiManager.getUIList()){ ui.update();}
+        cursorManager.update(gameObjects.stream().filter(other -> player.mouseCollidesWith(other)).collect(Collectors.toList()));
+        player.handleClickOnGameObject(gameObjects.stream().filter(other -> player.mouseCollidesWith(other)).collect(Collectors.toList()));
+        handleMouseInput();
+
     }
 
     @Override
     protected void handleMouseInput() {
-        /*if(input.isMouseClicked()){
-            System.out.println(String.format("Mouse clicked at position x:%d y:%d", (int)(input.getMousePosition().getX()+camera.getPosition ().intX()), (int)(input.getMousePosition().getY() + camera.getPosition().intY())));
-        }*/
-
         //always last
         input.clearMouseClicked();
-    }
-
-    public void updateCursor(){
-        List<GameObject> mouseOverObjects = gameObjects.stream().filter(other -> player.mouseCollidesWith(other)).collect(Collectors.toList());
-        cursorManager.update(mouseOverObjects);
     }
 
     public void statusUpdate(){

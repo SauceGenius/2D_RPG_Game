@@ -40,9 +40,8 @@ public class PlayerController implements Controller {
 
     public boolean isClicking() {return input.isMouseClicked();}
 
-    public boolean isInventoryOpen() {return input.isInventoryOpen();}
+    public boolean isRightClicking(){return input.isMouseRightClicked();}
 
-    public boolean isCharacterSheetOpen() {return input.isCharacterSheetOpen();}
 
     public Position getMousePosition(){ return input.getMousePosition();}
 

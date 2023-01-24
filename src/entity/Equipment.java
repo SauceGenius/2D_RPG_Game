@@ -22,13 +22,13 @@ public class Equipment {
     }
 
     public void update(AudioPlayer audioPlayer) {
-        if (!isOpen && playerController.isCharacterSheetOpen()){
+        /*if (!isOpen && playerController.isCharacterSheetOpen()){
             isOpen = true;
             audioPlayer.playSound("CharacterSheetOpen.wav");
         } else if (playerController.isCharacterSheetOpen()){isOpen = true;}
         else {
             isOpen = false;
-        }
+        }*/
     }
 
     public Item getItem(int i) {

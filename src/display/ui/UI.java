@@ -28,8 +28,8 @@ public abstract class UI {
         return texts;
     }
 
-    public abstract void update(AudioPlayer audioPlayer);
+    public abstract void update();
 
     public abstract void render(Graphics graphics);
-    public abstract void open();
+    public abstract void open(AudioPlayer audioPlayer);
 }

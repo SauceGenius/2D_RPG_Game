@@ -48,7 +48,7 @@ public class Game {
         Character character = new Character(1234, "SauceGenius", RaceId.human, GameClassId.warrior, input, audioPlayer, spriteLibrary, log);
         Player player = (Player) character.getGameObject();
 
-        UIManager uiManager = new UIManager(audioPlayer, log, player.getInventory());
+        UIManager uiManager = new UIManager(spriteLibrary, audioPlayer, log, player);
         input.addInputObserver(uiManager);
 
         display = new Display(Settings.WINDOW_WIDTH, Settings.WINDOW_HEIGHT, input, player, log, uiManager);

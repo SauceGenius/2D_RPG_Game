@@ -13,13 +13,11 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
     private Camera camera;
     private Position mousePosition;
     private boolean mouseClicked;
+    private boolean mouseRightClicked;
     private boolean mousePressed;
     private boolean[] pressed;
-    private boolean inventoryIsOpen = false;
-    private boolean characterSheetIsOpen = false;
     private boolean addingItem = false;
     private boolean looting = false;
-    /*private boolean attackRequested = false;*/
 
     //Constructor
     public Input(){
@@ -30,7 +28,9 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
 
     //////////////// MOUSE ////////////////
     @Override
-    public void mouseClicked(MouseEvent e) {mousePosition = new Position(e.getPoint().getX() + camera.getPosition().getX(), e.getPoint().getY() + camera.getPosition().getY());}
+    public void mouseClicked(MouseEvent e) {
+        notifyMouseClicked(e);
+        mousePosition = new Position(e.getPoint().getX() + camera.getPosition().getX(), e.getPoint().getY() + camera.getPosition().getY());}
 
     @Override
     public void mousePressed(MouseEvent e) {
@@ -41,6 +41,9 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
     public void mouseReleased(MouseEvent e) {
         mouseClicked = true;
         mousePressed = false;
+        if(e.getButton() == 3){
+            mouseRightClicked = true;
+        }
     }
 
     @Override
@@ -55,9 +58,14 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
     @Override
     public void mouseMoved(MouseEvent e) {mousePosition = new Position(e.getPoint().getX() + camera.getPosition().getX(), e.getPoint().getY() + camera.getPosition().getY());}
 
-    public void clearMouseClicked() {mouseClicked = false;}
+    public void clearMouseClicked() {mouseClicked = false; mouseRightClicked = false;}
+
     public Position getMousePosition() {return mousePosition;}
+
     public boolean isMouseClicked() {return mouseClicked;}
+
+    public boolean isMouseRightClicked() {return mouseRightClicked;}
+
     public boolean isMousePressed() {return mousePressed;}
 
 
@@ -66,29 +74,7 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
 
     //Methods
     @Override
-    public void keyTyped(KeyEvent e) {
-        notifyKeyTyped(e);
-
-        switch (e.getKeyChar()){
-            case 'b':
-                if(inventoryIsOpen == false) {
-                    inventoryIsOpen = true;
-                } else {
-                    inventoryIsOpen = false;}
-                break;
-            case 'c':
-                if(characterSheetIsOpen == false) {
-                    characterSheetIsOpen = true;
-                } else {
-                    characterSheetIsOpen = false;}
-                break;
-            case 'z':
-                if(looting == false) {
-                    looting = true;
-                } else {looting = false;}
-                break;
-        }
-    }
+    public void keyTyped(KeyEvent e) {notifyKeyTyped(e);}
 
     @Override
     public void keyPressed(KeyEvent e) {pressed[e.getKeyCode()] = true;}
@@ -98,8 +84,6 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
 
     //Getters
     public boolean isPressed(int keyCode) {return pressed[keyCode];}
-    public boolean isInventoryOpen() {return inventoryIsOpen;}
-    public boolean isCharacterSheetOpen() {return characterSheetIsOpen;}
     public boolean isAddingItem() {return addingItem;}
     public boolean isLooting() {return looting;}
 
@@ -118,17 +102,15 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
         }
     }
 
+    public void notifyMouseClicked(MouseEvent mouseClicked){
+        for(InputObserver inputObserver: inputObservers){
+            inputObserver.notifyMouseClicked(mouseClicked);
+        }
+    }
+
     //Setters
     public void setAddingItem(boolean addingItem) {this.addingItem = addingItem;}
     public void setLooting(boolean looting) {this.looting = looting;}
     public void setCamera(Camera camera) {this.camera = camera;}
-
-    /*public void setAttackRequested(boolean attackRequested) {
-        this.attackRequested = attackRequested;
-    }*/
-
-    /*public boolean isAttackRequested() {
-        return attackRequested;
-    }*/
 }
 

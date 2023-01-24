@@ -29,8 +29,7 @@ public class LogBoxUI extends UI {
     }
 
     @Override
-    public void update(AudioPlayer audioPlayer) {
-    }
+    public void update() {}
 
     @Override
     public void render(Graphics graphics) {
@@ -94,7 +93,5 @@ public class LogBoxUI extends UI {
     }
 
     @Override
-    public void open() {
-
-    }
+    public void open(AudioPlayer audioPlayer) {}
 }

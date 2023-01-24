@@ -57,7 +57,6 @@ public abstract class State {
         sortObjectsByPosition();
         gameObjects.forEach(gameObject -> gameObject.update(this));
         camera.update(this);
-        handleMouseInput();
         log.update();
     }
 

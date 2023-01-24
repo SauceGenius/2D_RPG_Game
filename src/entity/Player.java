@@ -5,7 +5,6 @@ import controller.Controller;
 import controller.PlayerController;
 import core.CollisionBox;
 import core.Log;
-import display.CursorManager;
 import entity.stats.Stats;
 import core.Timer;
 import game.state.State;
@@ -13,6 +12,7 @@ import gfx.AnimationManager;
 import gfx.SpriteLibrary;
 
 import java.awt.*;
+import java.util.List;
 
 public class Player extends MovingEntity {
 
@@ -49,52 +49,8 @@ public class Player extends MovingEntity {
         stats.update(equipment, audioPlayer, log);
         inventory.update(audioPlayer);
         equipment.update(audioPlayer);
-
         status.setHasTargetInReach(false);
-    }
-
-    private void combatUpdate() {
-        autoAttackTimer.update();
-
-        if(target == null){status.setInCombat(false);}
-
-        if (status.isInCombat()) {
-            if (status.hasTargetInReach()) {
-                if (autoAttackTimer.timeIsUp()) {
-
-                    //Activate auto attack
-                    autoAttackTimer.startClock(stats.getAttackSpeed());
-                    setIsAutoAttacking(true);
-                }
-            }
-        }
-    }
-
-    public boolean hits(){
-        double hitDice = Math.random();
-        if(hitDice <= stats.getHitChance()){
-            return true;
-        } else return false;
-    }
-
-    public boolean crits(){
-        double critDice = Math.random();
-        if(critDice <= stats.getCritChance()) return true;
-        else return false;
-    }
-
-    public double attackDamage(boolean isCrit){
-
-        double AP = (double)stats.getTotalStrength() * 2 + (double)stats.getLevelValue() * 3 - 20;
-        double dpsFromAP = AP / 14;
-        double damageFromAP = dpsFromAP * stats.getAttackSpeed();
-        double minDamage = stats.getMinMeleeWeaponDamage() + damageFromAP;
-        double maxDamage = stats.getMaxMeleeWeaponDamage() + damageFromAP;
-        double damage =  minDamage + Math.random() * (maxDamage - minDamage);
-
-        if (isCrit == true){
-            return damage * 1.5;
-        } else return damage;
+        updateTarget();
     }
 
     @Override
@@ -162,6 +118,80 @@ public class Player extends MovingEntity {
 
     @Override
     protected void handleDetectionCollisions(GameObject otherGameObject) {}
+
+    public void handleClickOnGameObject(List<GameObject> gameObjects) {
+        if(playerController.isClicking()){
+            for(GameObject other: gameObjects){
+                if(other instanceof NPC){
+                    if(!other.isDead()) {
+                        targets((MovingEntity) other);
+                    } else if(playerController.isRightClicking()){
+                        loots((NPC)other);
+                    }
+                }
+            }
+        }
+    }
+
+    private void targets(MovingEntity target){
+        setTarget(target);
+        audioPlayer.playSound("SelectTarget.wav");
+        if(playerController.isRightClicking()){
+            status.setInCombat(true);
+        }
+    }
+
+    private void updateTarget(){
+        if(target != null && target.hasBeenLooted()) {setTarget(null);}
+    }
+
+    public void aggroed(MovingEntity mob){
+        status.setInCombat(true);
+        if(target == null){
+            setTarget(mob);
+        }
+    }
+
+    private void combatUpdate() {
+        autoAttackTimer.update();
+        if(target == null){status.setInCombat(false);}
+        if (status.isInCombat()) {
+            if (status.hasTargetInReach()) {
+                if (autoAttackTimer.timeIsUp()) {
+                    //Activate auto attack
+                    autoAttackTimer.startClock(stats.getAttackSpeed());
+                    setIsAutoAttacking(true);
+                }
+            }
+        }
+    }
+
+    public boolean hits(){
+        double hitDice = Math.random();
+        if(hitDice <= stats.getHitChance()){
+            return true;
+        } else return false;
+    }
+
+    public boolean crits(){
+        double critDice = Math.random();
+        if(critDice <= stats.getCritChance()) return true;
+        else return false;
+    }
+
+    public double attackDamage(boolean isCrit){
+
+        double AP = (double)stats.getTotalStrength() * 2 + (double)stats.getLevelValue() * 3 - 20;
+        double dpsFromAP = AP / 14;
+        double damageFromAP = dpsFromAP * stats.getAttackSpeed();
+        double minDamage = stats.getMinMeleeWeaponDamage() + damageFromAP;
+        double maxDamage = stats.getMaxMeleeWeaponDamage() + damageFromAP;
+        double damage =  minDamage + Math.random() * (maxDamage - minDamage);
+
+        if (isCrit == true){
+            return damage * 1.5;
+        } else return damage;
+    }
 
     public void loots(NPC npc) {
         this.getInventory().addItem(npc.getLoot());
