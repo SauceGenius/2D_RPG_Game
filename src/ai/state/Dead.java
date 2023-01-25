@@ -1,8 +1,7 @@
 package ai.state;
 
 import ai.AITransition;
-import controller.NPCController;
-import entity.NPC;
+import gameobject.NPC;
 import game.state.State;
 
 public class Dead extends AIState{

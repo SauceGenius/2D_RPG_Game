@@ -11,7 +11,6 @@ public class Log {
     private static Timer criticalDamageFloatingTextTimer;
 
     public Log() {
-        System.out.println("Log created");
         general = new String[100][2];
         damageLog = new String[100][7];
         damageLogTimer = new Timer(1);

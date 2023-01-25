@@ -2,9 +2,8 @@ package gfx;
 
 import controller.Controller;
 import core.Direction;
-import entity.stats.Stats;
-import entity.stats.Status;
-import game.Game;
+import stats.Stats;
+import stats.Status;
 import core.Time;
 import settings.Settings;
 

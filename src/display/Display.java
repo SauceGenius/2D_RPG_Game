@@ -1,16 +1,14 @@
 package display;
 
 import core.Log;
-import display.ui.UI;
-import display.ui.UIManager;
-import entity.Player;
+import ui.UIController;
+import gameobject.Player;
 import game.state.State;
 import input.Input;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferStrategy;
-import java.util.ArrayList;
 
 public class Display extends JFrame {
 
@@ -21,7 +19,7 @@ public class Display extends JFrame {
     private int x = 20;
     private int y = 20;
 
-    public Display(int width, int height, Input input, Player player, Log log, UIManager uiManager) {
+    public Display(int width, int height, Input input, Player player, Log log, UIController uiManager) {
         this.log = log;
         ImageIcon icon = new ImageIcon("resources/official_wow_icon.png");
         setIconImage(icon.getImage());

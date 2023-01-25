@@ -1,24 +1,15 @@
 package display;
 
 import core.Log;
-import core.Position;
-import core.Size;
-import display.ui.InventoryUI;
-import display.ui.LogBoxUI;
-import display.ui.UI;
-import display.ui.UIManager;
-import entity.GameObject;
-import entity.GameObjectID;
-import entity.Player;
-import game.Game;
+import ui.UIController;
+import gameobject.GameObject;
+import id.GameObjectID;
+import gameobject.Player;
 import game.state.State;
 import map.Tile;
 import settings.Settings;
 
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-
 
 public class Renderer {
 
@@ -27,10 +18,10 @@ public class Renderer {
 
     private Log log;
     private Player player;
-    private UIManager uiManager;
+    private UIController uiManager;
 
 
-    public Renderer(Player player, Log log, UIManager uiManager) {
+    public Renderer(Player player, Log log, UIController uiManager) {
         this.log = log;
         this.player = player;
         this.uiManager = uiManager;
@@ -43,7 +34,6 @@ public class Renderer {
         renderNamePlates(state, graphics);
         renderHealthBar(state, graphics);
         renderFloatingCombatText(state, graphics);
-        renderInteractionOption(state, graphics);
         uiManager.render(graphics);
 
         if(devKitEnabled) renderDevKit(state, graphics);
@@ -133,7 +123,7 @@ public class Renderer {
                 if(tempObject.isDead()) {
                     graphics.setColor(Color.gray);
                 } else if(player.getStatus().isInCombat() && tempObject == player.getTarget()){
-                    graphics.setColor(Color.orange);
+                    graphics.setColor(Color.red);
                 } else graphics.setColor(Color.yellow);
 
                 //NPC Name
@@ -228,33 +218,6 @@ public class Renderer {
 
         if(log.getDamageFloatingTextTimer().timeIsUp()){log.clearDamageFloatingText();}
     }
-
-    private void renderInteractionOption(State state, Graphics graphics) {
-        graphics.setFont(new Font("TimesRoman", Font.BOLD, 12));
-        for (int i = 0; i < state.getGameObjects().size(); i++) {
-            GameObject tempObject = state.getGameObjects().get(i);
-            if (tempObject.getGameObjectID() == GameObjectID.NPC) {
-                if(tempObject.isDead() == true && tempObject.isInReach() == true) {
-                    graphics.setColor(Color.gray);
-                    graphics.fillRect(
-                            (int) (tempObject.getPosition().getX() - state.getCamera().getPosition().getX()) + 5,
-                            (int) (tempObject.getPosition().getY() - state.getCamera().getPosition().getY() - 12),
-                            36, 14);
-                    graphics.setColor(Color.black);
-                    graphics.drawRect(
-                            (int) (tempObject.getPosition().getX() - state.getCamera().getPosition().getX() + 5),
-                            (int) (tempObject.getPosition().getY() - state.getCamera().getPosition().getY() - 12),
-                            36, 14);
-
-                    graphics.setColor(Color.white);
-                    graphics.drawString("Loot",
-                            (int)(tempObject.getPosition().getX() - state.getCamera().getPosition().getX() + 10),
-                            (int)(tempObject.getPosition().getY() - state.getCamera().getPosition().getY()));
-                }
-            }
-        }
-    }
-
 
     // Dev mode //
     private void renderDevKit(State state, Graphics graphics) {

@@ -2,7 +2,7 @@ package display;
 
 import core.Position;
 import core.Size;
-import entity.GameObject;
+import gameobject.GameObject;
 import game.state.State;
 
 import java.util.Optional;

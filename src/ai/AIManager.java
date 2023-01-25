@@ -5,7 +5,7 @@ import ai.state.Dead;
 import ai.state.Stand;
 import ai.state.Wander;
 import controller.NPCController;
-import entity.NPC;
+import gameobject.NPC;
 import game.state.State;
 
 public class AIManager {

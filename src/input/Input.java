@@ -34,6 +34,7 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
 
     @Override
     public void mousePressed(MouseEvent e) {
+        notifyMousePressed(e);
         mousePressed = true;
     }
 
@@ -56,7 +57,10 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
     public void mouseDragged(MouseEvent e) {mousePosition = new Position(e.getPoint().getX() + camera.getPosition().getX(), e.getPoint().getY() + camera.getPosition().getY());}
 
     @Override
-    public void mouseMoved(MouseEvent e) {mousePosition = new Position(e.getPoint().getX() + camera.getPosition().getX(), e.getPoint().getY() + camera.getPosition().getY());}
+    public void mouseMoved(MouseEvent e) {
+        notifyMouseMoved(e);
+        mousePosition = new Position(e.getPoint().getX() + camera.getPosition().getX(), e.getPoint().getY() + camera.getPosition().getY());
+    }
 
     public void clearMouseClicked() {mouseClicked = false; mouseRightClicked = false;}
 
@@ -105,6 +109,18 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
     public void notifyMouseClicked(MouseEvent mouseClicked){
         for(InputObserver inputObserver: inputObservers){
             inputObserver.notifyMouseClicked(mouseClicked);
+        }
+    }
+
+    private void notifyMousePressed(MouseEvent mousePressed) {
+        for(InputObserver inputObserver: inputObservers){
+            inputObserver.notifyMousePressed(mousePressed);
+        }
+    }
+
+    private void notifyMouseMoved(MouseEvent mouseEvent){
+        for(InputObserver inputObserver: inputObservers){
+            inputObserver.notifyMouseMoved(mouseEvent);
         }
     }
 

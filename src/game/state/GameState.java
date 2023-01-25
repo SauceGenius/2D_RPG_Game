@@ -6,11 +6,11 @@ import core.Log;
 import core.Position;
 import core.Size;
 import display.CursorManager;
-import display.ui.UI;
-import display.ui.UIManager;
-import entity.NPC;
-import entity.Player;
-import entity.character.Character;
+import ui.UI;
+import ui.UIController;
+import gameobject.NPC;
+import gameobject.Player;
+import character.Character;
 import core.Time;
 import gfx.SpriteLibrary;
 import input.Input;
@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 
 public class GameState extends State {
 
-    public GameState(Size windowSize, Input input, Character character, Player player, AudioPlayer audioPlayer, SpriteLibrary spriteLibrary, Log log, CursorManager cursorManager, UIManager uiManager) {
+    public GameState(Size windowSize, Input input, Character character, Player player, AudioPlayer audioPlayer, SpriteLibrary spriteLibrary, Log log, CursorManager cursorManager, UIController uiManager) {
         super(windowSize, input, character, player, audioPlayer, spriteLibrary, log, cursorManager);
         input.setCamera(camera);
         gameMap = new GameMap(new Size(200,200),spriteLibrary);

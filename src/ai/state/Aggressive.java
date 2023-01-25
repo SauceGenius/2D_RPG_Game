@@ -2,8 +2,8 @@ package ai.state;
 
 import ai.AITransition;
 import controller.NPCController;
-import entity.NPC;
-import entity.Player;
+import gameobject.NPC;
+import gameobject.Player;
 import game.state.State;
 
 public class Aggressive extends AIState{

@@ -2,24 +2,18 @@ package game;
 
 import audio.AudioPlayer;
 import core.Log;
-import core.Size;
 import display.CursorManager;
 import display.Display;
-import display.ui.InventoryUI;
-import display.ui.LogBoxUI;
-import display.ui.UI;
-import display.ui.UIManager;
-import entity.Player;
-import entity.character.Character;
-import entity.character.GameClassId;
-import entity.character.RaceId;
-import game.state.GameState;
-import game.state.State;
+import ui.*;
+import gameobject.Player;
+import character.Character;
+import id.GameClassId;
+import id.RaceId;
 import game.state.StateManager;
 import gfx.SpriteLibrary;
 import input.Input;
-import input.InputObserver;
 import settings.Settings;
+import ui.button.CButton;
 
 import java.util.ArrayList;
 
@@ -39,21 +33,25 @@ public class Game {
     }
 
     public void initComponents(){
-        Log log = new Log();
         Input input = new Input();
 
         SpriteLibrary spriteLibrary = new SpriteLibrary();
         AudioPlayer audioPlayer = new AudioPlayer();
 
-        Character character = new Character(1234, "SauceGenius", RaceId.human, GameClassId.warrior, input, audioPlayer, spriteLibrary, log);
+        Character character = new Character(1234, "SauceGenius", RaceId.human, GameClassId.Paladin, input, audioPlayer, spriteLibrary);
         Player player = (Player) character.getGameObject();
+        Log log = character.getLog();
 
-        UIManager uiManager = new UIManager(spriteLibrary, audioPlayer, log, player);
-        input.addInputObserver(uiManager);
+        UIController uiController = new UIController(character, spriteLibrary, audioPlayer);
+        input.addInputObserver(uiController);
+        ArrayList<CButton> uiButtons = uiController.getButtons();
+        for(CButton button: uiButtons){
+            input.addInputObserver(button);
+        }
 
-        display = new Display(Settings.WINDOW_WIDTH, Settings.WINDOW_HEIGHT, input, player, log, uiManager);
+        display = new Display(Settings.WINDOW_WIDTH, Settings.WINDOW_HEIGHT, input, player, log, uiController);
         CursorManager cursorManager = new CursorManager(display);
-        stateManager = new StateManager(input, character, player, audioPlayer, spriteLibrary, log, cursorManager, uiManager);
+        stateManager = new StateManager(input, character, player, audioPlayer, spriteLibrary, log, cursorManager, uiController);
 
     }
 }

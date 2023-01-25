@@ -1,7 +1,7 @@
 package display;
 
-import entity.GameObject;
-import entity.GameObjectID;
+import gameobject.GameObject;
+import id.GameObjectID;
 
 import java.awt.*;
 import java.util.List;

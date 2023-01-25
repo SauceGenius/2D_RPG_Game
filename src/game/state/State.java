@@ -6,13 +6,10 @@ import core.Position;
 import core.Size;
 import display.Camera;
 import display.CursorManager;
-import display.ui.UI;
-import display.ui.UIManager;
-import entity.GameObject;
-import entity.GameObjectID;
-import entity.NPC;
-import entity.Player;
-import entity.character.Character;
+import ui.UIController;
+import gameobject.GameObject;
+import gameobject.Player;
+import character.Character;
 import core.Time;
 import gfx.SpriteLibrary;
 import input.Input;
@@ -26,7 +23,7 @@ import java.util.stream.Collectors;
 public abstract class State {
 
     protected Log log;
-    protected UIManager uiManager;
+    protected UIController uiManager;
     protected AudioPlayer audioPlayer;
     protected GameMap gameMap;
     protected List<GameObject> gameObjects;
