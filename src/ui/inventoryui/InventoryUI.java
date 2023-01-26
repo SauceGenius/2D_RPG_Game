@@ -37,7 +37,6 @@ public class InventoryUI extends UI {
     @Override
     public void render(Graphics graphics){
         if(opened){
-
             //Background Inventory Image
             graphics.drawImage(images.get(0), position.intX(), position.intY(), null);
 
@@ -46,23 +45,12 @@ public class InventoryUI extends UI {
                 inventorySlots[i].render(graphics);
             }
 
-            /*
-            // Each space (items)
-            int iconWidth = 36;
-            int iconHeight = 36;
-            int itemPosX = position.intX() + 20;
-            int itemPosY = position.intY() + 56;
-            int marginX = 8;
-            int marginY = 8;
-
-            for (int x = 0; x < 4; x++) {
-                for (int y = 0; y < 4; y++) {
-                    // Render item icons
-                    if (inventory.getItems()[(x + y * 4)] != null) {
-                        graphics.drawImage(inventory.getItems()[(x + y * 4)].getIconSprite(), x * (iconWidth + marginX) + itemPosX, y * (iconHeight + marginY) + itemPosY, null);
-                    }
+            //Tooltip
+            for(int i = 0; i < INVENTORY_SIZE; i++){
+                if(inventorySlots[i].mouseIsOver() && inventorySlots[i].getItem() != null && !inventorySlots[i].getItem().getItemIcon().isDragged()){
+                    inventorySlots[i].getItem().getTooltip().render(graphics, inventorySlots[i].getPosition());
                 }
-            }*/
+            }
         }
     }
 

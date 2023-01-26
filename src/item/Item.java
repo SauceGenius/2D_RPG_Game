@@ -1,18 +1,19 @@
 package item;
 
-import core.CollisionBox;
 import core.Position;
-import gfx.SpriteLibrary;
+import ui.Icon;
+import ui.tooltip.Tooltip;
 
 import java.awt.*;
-import java.awt.image.BufferedImage;
+
 
 public abstract class Item {
 
     protected ItemId itemId;
     protected String name;
-    protected Image icon;
+    protected Icon itemIcon;
     protected ItemStat itemStat;
+    protected Tooltip tooltip;
     protected boolean equipable;
 
     //protected Position iconPosition = new Position(0, 0);
@@ -20,13 +21,25 @@ public abstract class Item {
 
     public Item(ItemId itemId, Image image){
         this.itemId = itemId;
-        icon = image;
+        this.itemIcon = new Icon(image);
+    }
+
+    public void render(Graphics graphics, Position itemIconPosition, boolean mouseOver){
+        itemIcon.render(graphics, itemIconPosition);
+        /*if(mouseOver){
+            tooltip.render(graphics, itemIconPosition);
+        }*/
     }
 
     //Setter & Getters
     public String getName() {return name;}
-    public Image getIconSprite() {return icon;}
     public ItemId getId() {return itemId;}
     public ItemStat getItemStat() {return itemStat;}
     //public CollisionBox getCollisionBox(){return new CollisionBox(new Rectangle(iconPosition.intX(), iconPosition.intY(), iconDimension.width, iconDimension.height));}
+    public Icon getItemIcon(){
+        return itemIcon;
+    }
+    public Tooltip getTooltip(){
+        return tooltip;
+    }
 }

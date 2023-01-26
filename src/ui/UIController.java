@@ -41,6 +41,7 @@ public class UIController implements InputObserver {
     private AudioPlayer audioPlayer;
     private ArrayList<UI> uiList;
     private KeyBinds keyBinds;
+    private ArrayList<UIManagerObserver> observers;
 
     public UIController(Character character, SpriteLibrary spriteLibrary, AudioPlayer audioPlayer){
         this.character = character;
@@ -48,6 +49,7 @@ public class UIController implements InputObserver {
         this.audioPlayer = audioPlayer;
         this.uiList = new ArrayList<>();
         this.keyBinds = new KeyBinds();
+        this.observers = new ArrayList<>();
 
         Player player = (Player) character.getGameObject();
         addUI(new LogBoxUI(character.getLog()));
@@ -75,23 +77,16 @@ public class UIController implements InputObserver {
     }
 
     private void drag(Item item, int fromIndex) {
+        item.getItemIcon().setDragged(true);
         draggingItem = true;
         draggedItem = item;
         draggedOrigin = fromIndex;
-        System.out.println("Dragging: " + item.getName());
     }
 
     private void swapItems(Item itemIn, Item itemOut, int toIndex){
-        System.out.println("Swapping: " + itemIn + " with " + itemOut);
-        System.out.println("To index: " + toIndex);
-
         Inventory inventory = character.getInventory();
         inventory.getItems()[toIndex] = itemIn;
         inventory.getItems()[draggedOrigin] = itemOut;
-
-
-
-
 
         draggingItem = false;
         draggedItem = null;
@@ -153,17 +148,25 @@ public class UIController implements InputObserver {
 
     @Override
     public void notifyMouseClicked(MouseEvent mouseEvent) {
-
+        if(mouseEvent.getButton() == 3){
+            InventorySlot[] inventorySlots = ((InventoryUI)(uiList.get(INVENTORY))).getInventorySlots();
+            for(int i = 0; i < inventorySlots.length; i++){
+                if(inventorySlots[i].getCollisionBox().collidesWith(new CollisionBox(new Rectangle(mouseEvent.getX() - 2, mouseEvent.getY() - 2, 4, 4))) && inventorySlots[i].getItem() != null){
+                    System.out.println("Right Clicked on: " + inventorySlots[i].getItem().getName());
+                    for(UIManagerObserver observer: observers) {
+                        observer.notifyPlayerRightClickedOnItem(inventorySlots[i].getItem(), i);
+                    }
+                }
+            }
+        }
     }
 
     @Override
     public void notifyMousePressed(MouseEvent mouseEvent) {
         draggingItem = true;
-        System.out.println("Mouse pressed");
         InventorySlot[] inventorySlots = ((InventoryUI)(uiList.get(INVENTORY))).getInventorySlots();
         for(int i = 0; i < inventorySlots.length; i++){
             if(inventorySlots[i].getCollisionBox().collidesWith(new CollisionBox(new Rectangle(mouseEvent.getX() - 2, mouseEvent.getY() - 2, 4, 4))) && inventorySlots[i].getItem() != null){
-                System.out.println("From index: " + i);
                 drag(inventorySlots[i].getItem(), i);
             }
         }
@@ -171,14 +174,18 @@ public class UIController implements InputObserver {
 
     @Override
     public void notifyMouseReleased(MouseEvent mouseEvent) {
-        System.out.println("Mouse released");
         if(draggingItem){
             InventorySlot[] inventorySlots = ((InventoryUI)(uiList.get(INVENTORY))).getInventorySlots();
             for(int i = 0; i < inventorySlots.length; i++){
                 if(inventorySlots[i].getCollisionBox().collidesWith(new CollisionBox(new Rectangle(mouseEvent.getX() - 2, mouseEvent.getY() - 2, 4, 4)))){
                     swapItems(draggedItem, inventorySlots[i].getItem(), i);
                     inventorySlots[i].setDraggedOver(false);
-                } else draggingItem = false; //draggedItem = null;
+                } else {
+                    if(inventorySlots[i].getItem() != null){
+                        inventorySlots[i].getItem().getItemIcon().setDragged(false);
+                    }
+                    draggingItem = false;
+                }
             }
         }
     }

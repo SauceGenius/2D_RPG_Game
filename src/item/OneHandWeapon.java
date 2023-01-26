@@ -1,6 +1,7 @@
 package item;
 
 import gfx.SpriteLibrary;
+import ui.tooltip.TooltipGenerator;
 
 import java.awt.*;
 
@@ -24,5 +25,6 @@ public class OneHandWeapon extends Weapon {
         this.itemLevel = 2;
         this.maxDurability = 20;
         this.durability = maxDurability;
+        this.tooltip = new TooltipGenerator().generateItemTooltip(this);
     }
 }
