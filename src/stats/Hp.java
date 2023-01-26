@@ -19,7 +19,6 @@ public class Hp {
     }
 
     public Hp(int level, int stamina){
-        System.out.println("Creating HP");
         if(stamina < 20) {
             this.maxHp = stamina + 20;
         } else {

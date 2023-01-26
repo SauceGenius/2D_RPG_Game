@@ -1,6 +1,6 @@
 package gfx;
 
-import controller.Controller;
+import controller.MovementController;
 import core.Direction;
 import stats.Stats;
 import stats.Status;
@@ -12,7 +12,7 @@ import java.awt.image.BufferedImage;
 
 public class AnimationManager {
 
-    private Controller controller;
+    private MovementController controller;
     private SpriteSet spriteSet;
     private Stats stats;
     private Status status;
@@ -26,7 +26,7 @@ public class AnimationManager {
     private boolean isPlayingAutoAttackAnimation;
     private boolean isDying;
 
-    public AnimationManager(Stats stats, Status status, Controller controller, SpriteSet spriteSet){
+    public AnimationManager(Stats stats, Status status, MovementController controller, SpriteSet spriteSet){
         this.isDying = false;
         this.stats = stats;
         this.status = status;

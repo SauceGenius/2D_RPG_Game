@@ -1,9 +1,6 @@
-package Inventory;
+package inventory;
 
-import audio.AudioPlayer;
-import controller.PlayerController;
 import item.Item;
-import gfx.SpriteLibrary;
 
 public class Inventory {
 
@@ -24,7 +21,7 @@ public class Inventory {
                 items[i] = item;
                 break;
             } else if(i == items.length - 1 && items[i] != null){
-                System.out.println("Inventory.Inventory is full");
+                System.out.println("Inventory is full");
             }
         }
     }
@@ -32,7 +29,12 @@ public class Inventory {
     public Item[] getItems() {
         return items;
     }
+    public int getSize(){
+        return space;}
 
+    public void setItem(int i, Item item){
+        items[i] = item;
+    }
 }
 
 

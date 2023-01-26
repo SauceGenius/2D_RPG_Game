@@ -45,6 +45,7 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
         if(e.getButton() == 3){
             mouseRightClicked = true;
         }
+        notifyMouseReleased(e);
     }
 
     @Override
@@ -54,7 +55,10 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
     public void mouseExited(MouseEvent e) {}
 
     @Override
-    public void mouseDragged(MouseEvent e) {mousePosition = new Position(e.getPoint().getX() + camera.getPosition().getX(), e.getPoint().getY() + camera.getPosition().getY());}
+    public void mouseDragged(MouseEvent e) {
+        notifyMouseDragged(e);
+        mousePosition = new Position(e.getPoint().getX() + camera.getPosition().getX(), e.getPoint().getY() + camera.getPosition().getY());
+    }
 
     @Override
     public void mouseMoved(MouseEvent e) {
@@ -118,11 +122,24 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
         }
     }
 
+    private void notifyMouseReleased(MouseEvent mouseEvent){
+        for(InputObserver inputObserver: inputObservers){
+            inputObserver.notifyMouseReleased(mouseEvent);
+        }
+    }
+
     private void notifyMouseMoved(MouseEvent mouseEvent){
         for(InputObserver inputObserver: inputObservers){
             inputObserver.notifyMouseMoved(mouseEvent);
         }
     }
+
+    private void notifyMouseDragged(MouseEvent mouseEvent){
+        for(InputObserver inputObserver: inputObservers){
+            inputObserver.notifyMouseDragged(mouseEvent);
+        }
+    }
+
 
     //Setters
     public void setAddingItem(boolean addingItem) {this.addingItem = addingItem;}

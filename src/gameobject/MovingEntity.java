@@ -1,7 +1,7 @@
 package gameobject;
 
 import audio.AudioPlayer;
-import controller.Controller;
+import controller.MovementController;
 import core.*;
 import stats.Status;
 import game.state.State;
@@ -14,7 +14,7 @@ import java.awt.*;
 public abstract class MovingEntity extends GameObject {
 
     // Variables
-    protected Controller controller;
+    protected MovementController controller;
     protected AudioPlayer audioPlayer;
     protected Motion motion;
     protected AnimationManager animationManager;
@@ -22,7 +22,7 @@ public abstract class MovingEntity extends GameObject {
     protected SpriteLibrary spriteLibrary;
 
     // Constructor
-    public MovingEntity(Controller controller, AudioPlayer audioPlayer, SpriteLibrary spriteLibrary, Log log){
+    public MovingEntity(MovementController controller, AudioPlayer audioPlayer, SpriteLibrary spriteLibrary, Log log){
         super(log);
         this.controller = controller;
         this.audioPlayer = audioPlayer;
@@ -93,7 +93,7 @@ public abstract class MovingEntity extends GameObject {
     // Setters and getters
     @Override
     public Image getSprite() {return animationManager.getSprite();}
-    public Controller getController() {return controller;}
+    public MovementController getController() {return controller;}
     public Motion getMotion() {return motion;}
     public AnimationManager getAnimationManager() {return animationManager;}
 }

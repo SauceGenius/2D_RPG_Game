@@ -2,10 +2,12 @@ package item;
 
 import gfx.SpriteLibrary;
 
+import java.awt.*;
+
 public class OneHandWeapon extends Weapon {
 
-    public OneHandWeapon(ItemId itemId, SpriteLibrary spriteLibrary) {
-        super(itemId, spriteLibrary);
+    public OneHandWeapon(ItemId itemId, Image image) {
+        super(itemId, image);
 
         if(itemId == ItemId.wornShortSword){
             createWornShortSword();
@@ -19,5 +21,8 @@ public class OneHandWeapon extends Weapon {
         this.minDamage = 1;
         this.maxDamage = 3;
         this.dps = 1.1;
+        this.itemLevel = 2;
+        this.maxDurability = 20;
+        this.durability = maxDurability;
     }
 }

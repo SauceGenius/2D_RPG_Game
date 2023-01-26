@@ -1,8 +1,9 @@
-package ui.inventory;
+package ui.inventoryui;
 
 import audio.AudioPlayer;
 import core.Position;
-import Inventory.Inventory;
+import inventory.Inventory;
+import item.Item;
 import ui.UI;
 import ui.button.ItemIcon;
 
@@ -14,6 +15,7 @@ public class InventoryUI extends UI {
 
     private static final int INVENTORY_SIZE = 16;
     private InventorySlot[] inventorySlots;
+    private Inventory inventory;
 
     public InventoryUI(Inventory inventory) {
         opened = false;
@@ -25,15 +27,26 @@ public class InventoryUI extends UI {
         inventorySlots = new InventorySlot[INVENTORY_SIZE];
         for(int i = 0; i < INVENTORY_SIZE; i++) inventorySlots[i] = new InventorySlot(i, position);
     }
-    private Inventory inventory;
 
-    public void update() {}
+    public void update() {
+        for(int i = 0; i < INVENTORY_SIZE; i++){
+            inventorySlots[i].update(inventory);
+        }
+    }
 
     @Override
     public void render(Graphics graphics){
         if(opened){
+
+            //Background Inventory Image
             graphics.drawImage(images.get(0), position.intX(), position.intY(), null);
 
+            //Each Inventory Slot and Item
+            for(int i = 0; i < INVENTORY_SIZE; i++){
+                inventorySlots[i].render(graphics);
+            }
+
+            /*
             // Each space (items)
             int iconWidth = 36;
             int iconHeight = 36;
@@ -42,10 +55,6 @@ public class InventoryUI extends UI {
             int marginX = 8;
             int marginY = 8;
 
-            for(int i = 0; i < INVENTORY_SIZE; i++){
-                inventorySlots[i].render(graphics);
-            }
-
             for (int x = 0; x < 4; x++) {
                 for (int y = 0; y < 4; y++) {
                     // Render item icons
@@ -53,7 +62,7 @@ public class InventoryUI extends UI {
                         graphics.drawImage(inventory.getItems()[(x + y * 4)].getIconSprite(), x * (iconWidth + marginX) + itemPosX, y * (iconHeight + marginY) + itemPosY, null);
                     }
                 }
-            }
+            }*/
         }
     }
 
@@ -65,6 +74,14 @@ public class InventoryUI extends UI {
         } else {
             opened = false;
             audioPlayer.playSound("CloseInventory.wav");
+        }
+    }
+
+    public void addItem(Item item){
+        for(int i = 0; i < INVENTORY_SIZE; i++){
+            if(inventorySlots[i].getItem() == null){
+                inventorySlots[i].setItem(item);
+            }
         }
     }
 
@@ -82,4 +99,7 @@ public class InventoryUI extends UI {
         return itemIcons;
     }
 
+    public Inventory getInventory() {
+        return inventory;
+    }
 }

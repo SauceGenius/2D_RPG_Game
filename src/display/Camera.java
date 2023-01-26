@@ -11,7 +11,6 @@ public class Camera {
 
     private Position position;
     private Size windowSize;
-
     private Optional<GameObject> objectWithFocus;
 
     public Camera(Size windowSize) {

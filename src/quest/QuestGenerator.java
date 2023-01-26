@@ -20,7 +20,7 @@ public class QuestGenerator {
             String body = "We have a problem with them goblins. They be eating all our food and terrorizing our women. Is there gonna be somebody capable enough to rid us of them pesky rats.";
             int exp = 400;
             int gold = 30;
-            Item itemReward = new OneHandWeapon(ItemId.twoHandWeapon, spriteLibrary);
+            Item itemReward = new OneHandWeapon(ItemId.twoHandWeapon, spriteLibrary.getIcon("inv_sword_34"));
             return new Quest(title,body, new QuestReward(exp, gold, itemReward));
         } else return null;
     }

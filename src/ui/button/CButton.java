@@ -85,13 +85,13 @@ public class CButton implements InputObserver {
     }
 
     @Override
-    public void notifyMouseClicked(MouseEvent mouseClicked) {
+    public void notifyMouseClicked(MouseEvent mouseEvent) {
 
     }
 
     @Override
-    public void notifyMousePressed(MouseEvent mousePressed) {
-        if(getCollisionBox().collidesWith(new CollisionBox(new Rectangle(mousePressed.getX(), mousePressed.getY(), 10, 10)))){
+    public void notifyMousePressed(MouseEvent mouseEvent) {
+        if(getCollisionBox().collidesWith(new CollisionBox(new Rectangle(mouseEvent.getX(), mouseEvent.getY(), 10, 10)))){
             for(ButtonObserver buttonObserver: buttonObservers){
                 buttonObserver.notifyButtonClicked(this);
             }
@@ -99,7 +99,12 @@ public class CButton implements InputObserver {
     }
 
     @Override
-    public void notifyMouseDragged(MouseEvent mouseDragged) {
+    public void notifyMouseReleased(MouseEvent mouseEvent) {
+
+    }
+
+    @Override
+    public void notifyMouseDragged(MouseEvent mouseEvent) {
 
     }
 

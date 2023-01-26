@@ -1,10 +1,11 @@
 package character;
 
-import Inventory.Inventory;
+import inventory.Inventory;
 import audio.AudioPlayer;
 import controller.PlayerController;
 import core.Log;
 import equipment.Equipment;
+import game.state.State;
 import gameobject.GameObject;
 import gameobject.Player;
 import stats.Stats;
@@ -45,7 +46,10 @@ public class Character {
         this.log = new Log();
     }
 
-    public void update(){
+    public void update(State state){
+        gameObject.update(state);
+        inventory.update();
+        equipment.update();
         log.update();
     }
 

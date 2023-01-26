@@ -1,6 +1,6 @@
 package core;
 
-import controller.Controller;
+import controller.MovementController;
 
 
 public class Motion {
@@ -19,7 +19,7 @@ public class Motion {
         this.isAttacking = false;
     }
 
-    public void update(Controller controller){
+    public void update(MovementController controller){
         int deltaX = 0;
         int deltaY = 0;
 

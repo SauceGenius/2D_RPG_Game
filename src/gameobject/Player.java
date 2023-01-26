@@ -1,19 +1,21 @@
 package gameobject;
 
-import Inventory.Inventory;
+import inventory.Inventory;
 import audio.AudioPlayer;
-import controller.Controller;
+import controller.MovementController;
 import controller.PlayerController;
 import core.CollisionBox;
 import core.Log;
 import equipment.Equipment;
+import item.Item;
+import item.ItemId;
+import item.OneHandWeapon;
 import stats.Stats;
 import core.Timer;
 import game.state.State;
 import gfx.AnimationManager;
 import gfx.SpriteLibrary;
 import id.GameObjectID;
-import quest.QuestLog;
 
 import java.awt.*;
 import java.util.List;
@@ -22,25 +24,35 @@ public class Player extends MovingEntity {
 
     //Variables
     private MovingEntity target;
-    private Inventory inventory;
     private Equipment equipment;
-    private QuestLog questLog;
     private PlayerController playerController;
     private Timer autoAttackTimer;
     private AudioPlayer audioPlayer;
 
+    //TO REMOVE
+    private Inventory inventory;
+
     //Constructor
-    public Player(String userName, Controller controller, AudioPlayer audioPlayer, Stats stats, Inventory inventory, Equipment equipment, SpriteLibrary spriteLibrary, Log log){
+    public Player(String userName, MovementController controller, AudioPlayer audioPlayer, Stats stats, Inventory inventory, Equipment equipment, SpriteLibrary spriteLibrary, Log log){
         super(controller, audioPlayer, spriteLibrary, log);
         this.playerController = (PlayerController) controller;
         this.gameObjectID = GameObjectID.player;
         this.stats = stats;
+        this.inventory = inventory;
         this.name = userName;
         this.animationManager = new AnimationManager(stats, status, controller, spriteLibrary.getUnit("player"));
-        this.inventory = inventory;
         this.equipment = equipment;
         this.autoAttackTimer = new Timer(1);
         this.audioPlayer = audioPlayer;
+
+        Item item = new OneHandWeapon(ItemId.wornShortSword, spriteLibrary.getIcon("inv_sword_34"));
+        inventory.addItem(item);
+        inventory.addItem(item);
+        inventory.addItem(item);
+        inventory.addItem(item);
+        inventory.addItem(item);
+        inventory.addItem(item);
+        inventory.addItem(item);
     }
 
     //Methods
@@ -52,8 +64,6 @@ public class Player extends MovingEntity {
         decideAnimation();
         animationManager.update(direction);
         stats.update(equipment, audioPlayer, log);
-        inventory.update();
-        equipment.update(audioPlayer);
         status.setHasTargetInReach(false);
         updateTarget();
     }
@@ -200,10 +210,10 @@ public class Player extends MovingEntity {
 
     public void loots(NPC npc) {
         //TO IMPLEMENT: If inventory is not full
-        this.getInventory().addItem(npc.getLoot());
+        inventory.addItem(npc.getLoot());
         npc.status.setHasBeenLooted(true);
         log.addToGeneral("Loot","You receive loot: " + npc.getLoot().getName() + ".");
-        audioPlayer.playMusic("LootCreatureEmpty.wav");
+        audioPlayer.playSound("LootCreatureEmpty.wav");
     }
 
     @Override
@@ -238,7 +248,6 @@ public class Player extends MovingEntity {
 
     //Getters
     public Stats getStats() {return stats;}
-    public Inventory getInventory() {return inventory;}
     public Equipment getEquipment() {return equipment;}
     public PlayerController getPlayerController(){return this.playerController;}
     public MovingEntity getTarget() {return target;}

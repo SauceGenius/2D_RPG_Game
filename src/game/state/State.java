@@ -27,8 +27,10 @@ public abstract class State {
     protected AudioPlayer audioPlayer;
     protected GameMap gameMap;
     protected List<GameObject> gameObjects;
+
+    protected ArrayList<Character> characters;
     protected Character character;
-    protected Player player;
+
     protected SpriteLibrary spriteLibrary;
     protected Input input;
     protected Camera camera;
@@ -36,23 +38,24 @@ public abstract class State {
     protected List<Time> respawnTimer;
     protected CursorManager cursorManager;
 
-    public State(Size windowSize, Input input, Character character, Player player, AudioPlayer audioPlayer, SpriteLibrary spriteLibrary, Log log, CursorManager cursorManager) {
+    public State(Size windowSize, Input input, Character character, AudioPlayer audioPlayer, SpriteLibrary spriteLibrary, Log log, CursorManager cursorManager) {
         camera = new Camera(windowSize);
         this.log = log;
         this.audioPlayer = audioPlayer;
         this.input = input;
         this.character = character;
-        this.player = player;
         this.spriteLibrary = spriteLibrary;
-        gameObjects = new ArrayList<>();
-        time = new Time();
-        respawnTimer = new ArrayList<>();
+        this.gameObjects = new ArrayList<>();
+        this.characters = new ArrayList<>();
+        this.time = new Time();
+        this.respawnTimer = new ArrayList<>();
         this.cursorManager = cursorManager;
     }
 
     public void update(){
         sortObjectsByPosition();
         gameObjects.forEach(gameObject -> gameObject.update(this));
+        characters.forEach(character -> character.update(this));
         camera.update(this);
         log.update();
     }
@@ -75,6 +78,15 @@ public abstract class State {
     public List<GameObject> getDetectedObjects(GameObject gameObject) {
         return gameObjects.stream().filter(other -> other.detectionCollidesWith(gameObject)).collect(Collectors.toList());
     }
+
+    public void addCharacter(Character character){
+        characters.add(character);
+    }
+
+    public void removeCharacter(Character character){
+        characters.remove(character);
+    }
+
 
     //Getters
     public List<GameObject> getGameObjects() {

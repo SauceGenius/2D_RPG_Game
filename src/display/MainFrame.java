@@ -1,6 +1,7 @@
 package display;
 
 import core.Log;
+import login.AccountController;
 import ui.UIController;
 import gameobject.Player;
 import game.state.State;
@@ -10,8 +11,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferStrategy;
 
-public class Display extends JFrame {
+public class MainFrame extends JFrame {
 
+    private AccountController accountController;
     private Log log;
     private Canvas canvas;
     private Renderer renderer;
@@ -19,7 +21,7 @@ public class Display extends JFrame {
     private int x = 20;
     private int y = 20;
 
-    public Display(int width, int height, Input input, Player player, Log log, UIController uiManager) {
+    public MainFrame(int width, int height, AccountController accountController, Input input, Player player, Log log, UIController uiController) {
         this.log = log;
         ImageIcon icon = new ImageIcon("resources/official_wow_icon.png");
         setIconImage(icon.getImage());
@@ -27,7 +29,7 @@ public class Display extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setResizable(false);
 
-        this.renderer = new Renderer(player, log, uiManager);
+        this.renderer = new Renderer(accountController, player, log, uiController);
 
         canvas = new Canvas();
         canvas.setPreferredSize(new Dimension(width, height));
@@ -62,5 +64,13 @@ public class Display extends JFrame {
         ////////////////////////////////////////////////////
         graphics.dispose();
         bufferStrategy.show();
+    }
+
+    public void changeToLogInDisplay(){
+
+    }
+
+    public void changeToGameDisplay(){
+
     }
 }

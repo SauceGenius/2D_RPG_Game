@@ -5,9 +5,11 @@ import java.awt.event.MouseEvent;
 
 public interface InputObserver {
 
-    void notifyKeyPressed(KeyEvent keyPressed);
-    void notifyMouseClicked(MouseEvent mouseClicked);
-    void notifyMousePressed(MouseEvent mousePressed);
-    void notifyMouseDragged(MouseEvent mouseDragged);
+    void notifyMouseClicked(MouseEvent mouseEvent);
+    void notifyMousePressed(MouseEvent mouseEvent);
+    void notifyMouseReleased(MouseEvent mouseEvent);
     void notifyMouseMoved(MouseEvent mouseEvent);
+    void notifyMouseDragged(MouseEvent mouseEvent);
+    void notifyKeyPressed(KeyEvent keyPressed);
+
 }

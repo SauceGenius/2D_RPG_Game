@@ -20,9 +20,9 @@ public class CursorManager {
     private Cursor lootCursor;
     private Cursor interactCursor;
     private Cursor flightCursor;
-    private Display display;
+    private MainFrame display;
 
-    public CursorManager(Display display){
+    public CursorManager(MainFrame display){
         this.display = display;
         initCursors();
         changeCursor(CursorManager.DEFAULT);

@@ -1,6 +1,7 @@
 package display;
 
 import core.Log;
+import login.AccountController;
 import ui.UIController;
 import gameobject.GameObject;
 import id.GameObjectID;
@@ -16,15 +17,18 @@ public class Renderer {
     //For testing
     private boolean devKitEnabled = false;
 
+    private Camera camera;
     private Log log;
     private Player player;
-    private UIController uiManager;
+    private UIController uiController;
 
 
-    public Renderer(Player player, Log log, UIController uiManager) {
+    public Renderer(AccountController accountController, Player player, Log log, UIController uiController) {
+        //this.camera = new Camera(new Size(Settings.WINDOW_WIDTH, Settings.WINDOW_HEIGHT));
+        //camera.focusOn();
         this.log = log;
         this.player = player;
-        this.uiManager = uiManager;
+        this.uiController = uiController;
     }
 
     public void render(State state, Graphics graphics) {
@@ -34,7 +38,7 @@ public class Renderer {
         renderNamePlates(state, graphics);
         renderHealthBar(state, graphics);
         renderFloatingCombatText(state, graphics);
-        uiManager.render(graphics);
+        uiController.render(graphics);
 
         if(devKitEnabled) renderDevKit(state, graphics);
     }

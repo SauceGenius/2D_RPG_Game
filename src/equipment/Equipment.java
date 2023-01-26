@@ -1,6 +1,5 @@
 package equipment;
 
-import audio.AudioPlayer;
 import controller.PlayerController;
 import item.Item;
 import item.ItemId;
@@ -18,17 +17,11 @@ public class Equipment {
         this.isOpen = false;
         this.playerController = playerController;
         this.equipment = new Item[size];
-        equipment[0] = (Item) new OneHandWeapon(ItemId.wornShortSword, spriteLibrary);
+        equipment[0] = (Item) new OneHandWeapon(ItemId.wornShortSword, spriteLibrary.getIcon("inv_sword_34"));
     }
 
-    public void update(AudioPlayer audioPlayer) {
-        /*if (!isOpen && playerController.isCharacterSheetOpen()){
-            isOpen = true;
-            audioPlayer.playSound("CharacterSheetOpen.wav");
-        } else if (playerController.isCharacterSheetOpen()){isOpen = true;}
-        else {
-            isOpen = false;
-        }*/
+    public void update() {
+
     }
 
     public Item getItem(int i) {

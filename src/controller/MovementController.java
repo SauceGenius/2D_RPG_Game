@@ -1,6 +1,6 @@
 package controller;
 
-public interface Controller {
+public interface MovementController {
 
     boolean isRequestingUp();
     boolean isRequestingDown();

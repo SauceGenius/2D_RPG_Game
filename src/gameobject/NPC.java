@@ -3,7 +3,7 @@ package gameobject;
 import ai.AIManager;
 import ai.state.Aggressive;
 import audio.AudioPlayer;
-import controller.Controller;
+import controller.MovementController;
 import controller.NPCController;
 import core.Log;
 import item.Item;
@@ -25,7 +25,7 @@ public class NPC extends MovingEntity {
     private NPCController npcController;
 
     // Constructor
-    public NPC(Controller controller, AudioPlayer audioPlayer, SpriteLibrary spriteLibrary, Log log) {
+    public NPC(MovementController controller, AudioPlayer audioPlayer, SpriteLibrary spriteLibrary, Log log) {
         super(controller, audioPlayer, spriteLibrary, log);
         this.npcController = (NPCController) controller;
         this.gameObjectID = GameObjectID.NPC;
@@ -33,7 +33,7 @@ public class NPC extends MovingEntity {
         this.stats.getLevel().setExp(30);
         animationManager = new AnimationManager(stats, status, controller, spriteLibrary.getUnit("goblin"));
         aiManager = new AIManager();
-        this.loot = new OneHandWeapon(ItemId.wornShortSword, spriteLibrary);
+        this.loot = new OneHandWeapon(ItemId.wornShortSword, spriteLibrary.getIcon("inv_sword_34"));
         this.name = "Goblin";
         timer = new Time();
         this.motion.setSpeed(2);

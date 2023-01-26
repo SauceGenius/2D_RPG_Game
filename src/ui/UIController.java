@@ -1,15 +1,17 @@
 package ui;
 
+import inventory.Inventory;
 import audio.AudioPlayer;
 import core.CollisionBox;
 import gameobject.Player;
 import character.Character;
 import gfx.SpriteLibrary;
 import input.InputObserver;
+import item.Item;
 import settings.KeyBinds;
 import ui.button.CButton;
-import ui.inventory.InventorySlot;
-import ui.inventory.InventoryUI;
+import ui.inventoryui.InventorySlot;
+import ui.inventoryui.InventoryUI;
 import ui.unitframes.PlayerUnitFrame;
 import ui.unitframes.TargetUnitFrame;
 
@@ -30,6 +32,10 @@ public class UIController implements InputObserver {
     private static final int TARGET_UNIT_FRAME = 6;
     private static final int QUEST_LOG = 7;
 
+    private boolean draggingItem = false;
+    private Item draggedItem;
+    private int draggedOrigin;
+
     private Character character;
     private SpriteLibrary spriteLibrary;
     private AudioPlayer audioPlayer;
@@ -45,7 +51,7 @@ public class UIController implements InputObserver {
 
         Player player = (Player) character.getGameObject();
         addUI(new LogBoxUI(character.getLog()));
-        addUI(new InventoryUI(player.getInventory()));
+        addUI(new InventoryUI(character.getInventory()));
         addUI(new CharacterPanelUI(character));
         addUI(new ActionBarUI(character));
         addUI(new ExpBarUI(character));
@@ -54,7 +60,9 @@ public class UIController implements InputObserver {
         addUI(new QuestLogUI(character));
     }
 
-    public void update(){}
+    public void update(){
+        uiList.forEach(ui -> ui.update());
+    }
 
     public void render(Graphics graphics){
         for(UI ui: uiList){
@@ -62,7 +70,32 @@ public class UIController implements InputObserver {
         }
     }
 
-    public void toggle(int type){uiList.get(type).toggle(audioPlayer);}
+    public void toggle(int type){
+        uiList.get(type).toggle(audioPlayer);
+    }
+
+    private void drag(Item item, int fromIndex) {
+        draggingItem = true;
+        draggedItem = item;
+        draggedOrigin = fromIndex;
+        System.out.println("Dragging: " + item.getName());
+    }
+
+    private void swapItems(Item itemIn, Item itemOut, int toIndex){
+        System.out.println("Swapping: " + itemIn + " with " + itemOut);
+        System.out.println("To index: " + toIndex);
+
+        Inventory inventory = character.getInventory();
+        inventory.getItems()[toIndex] = itemIn;
+        inventory.getItems()[draggedOrigin] = itemOut;
+
+
+
+
+
+        draggingItem = false;
+        draggedItem = null;
+    }
 
     private void addUI(UI ui){
         uiList.add(ui);
@@ -116,29 +149,49 @@ public class UIController implements InputObserver {
                 inventorySlots[i].setMouseOver(true);
             } else inventorySlots[i].setMouseOver(false);
         }
-
-        ((InventoryUI)(uiList.get(INVENTORY))).getItemIcons().forEach(itemIcon -> {
-            if(itemIcon.getCollisionBox().collidesWith(new CollisionBox(new Rectangle(mouseEvent.getX() - 2, mouseEvent.getY() - 2, 4, 4)))){
-                itemIcon.setMouseOver(true);
-                System.out.println("Mouse over item icon");
-            } else itemIcon.setMouseOver(false);
-        });
-
-        character.getInventory().getItems();
     }
 
     @Override
-    public void notifyMouseClicked(MouseEvent mouseClicked) {
+    public void notifyMouseClicked(MouseEvent mouseEvent) {
 
     }
 
     @Override
-    public void notifyMousePressed(MouseEvent mousePressed) {
-
+    public void notifyMousePressed(MouseEvent mouseEvent) {
+        draggingItem = true;
+        System.out.println("Mouse pressed");
+        InventorySlot[] inventorySlots = ((InventoryUI)(uiList.get(INVENTORY))).getInventorySlots();
+        for(int i = 0; i < inventorySlots.length; i++){
+            if(inventorySlots[i].getCollisionBox().collidesWith(new CollisionBox(new Rectangle(mouseEvent.getX() - 2, mouseEvent.getY() - 2, 4, 4))) && inventorySlots[i].getItem() != null){
+                System.out.println("From index: " + i);
+                drag(inventorySlots[i].getItem(), i);
+            }
+        }
     }
 
     @Override
-    public void notifyMouseDragged(MouseEvent mouseDragged) {
+    public void notifyMouseReleased(MouseEvent mouseEvent) {
+        System.out.println("Mouse released");
+        if(draggingItem){
+            InventorySlot[] inventorySlots = ((InventoryUI)(uiList.get(INVENTORY))).getInventorySlots();
+            for(int i = 0; i < inventorySlots.length; i++){
+                if(inventorySlots[i].getCollisionBox().collidesWith(new CollisionBox(new Rectangle(mouseEvent.getX() - 2, mouseEvent.getY() - 2, 4, 4)))){
+                    swapItems(draggedItem, inventorySlots[i].getItem(), i);
+                    inventorySlots[i].setDraggedOver(false);
+                } else draggingItem = false; //draggedItem = null;
+            }
+        }
+    }
 
+    @Override
+    public void notifyMouseDragged(MouseEvent mouseEvent) {
+        if(draggingItem){
+            InventorySlot[] inventorySlots = ((InventoryUI)(uiList.get(INVENTORY))).getInventorySlots();
+            for(int i = 0; i < inventorySlots.length; i++){
+                if(inventorySlots[i].getCollisionBox().collidesWith(new CollisionBox(new Rectangle(mouseEvent.getX() - 2, mouseEvent.getY() - 2, 4, 4)))){
+                    inventorySlots[i].setDraggedOver(true);
+                } else inventorySlots[i].setDraggedOver(false);
+            }
+        }
     }
 }

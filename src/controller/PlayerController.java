@@ -5,14 +5,44 @@ import input.Input;
 import input.InputObserver;
 
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
+import java.awt.event.MouseEvent;
 
-public class PlayerController implements Controller {
+public class PlayerController implements MovementController, InputObserver {
 
     private Input input;
 
     public PlayerController(Input input){
         this.input = input;
+    }
+
+    @Override
+    public void notifyKeyPressed(KeyEvent keyPressed) {
+
+    }
+
+    @Override
+    public void notifyMouseClicked(MouseEvent mouseEvent) {
+
+    }
+
+    @Override
+    public void notifyMousePressed(MouseEvent mouseEvent) {
+
+    }
+
+    @Override
+    public void notifyMouseReleased(MouseEvent mouseEvent) {
+
+    }
+
+    @Override
+    public void notifyMouseDragged(MouseEvent mouseEvent) {
+
+    }
+
+    @Override
+    public void notifyMouseMoved(MouseEvent mouseEvent) {
+
     }
 
     @Override

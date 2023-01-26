@@ -2,15 +2,17 @@ package item;
 
 import gfx.SpriteLibrary;
 
-public abstract class Weapon extends Item{
+import java.awt.*;
+
+public abstract class Weapon extends EquipableItem{
 
     protected double speed;
     protected double dps;
     protected int minDamage;
     protected int maxDamage;
 
-    public Weapon(ItemId itemId, SpriteLibrary spriteLibrary) {
-        super(itemId, spriteLibrary);
+    public Weapon(ItemId itemId, Image image) {
+        super(itemId, image);
 
         this.equipable = true;
     }

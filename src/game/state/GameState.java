@@ -16,13 +16,14 @@ import gfx.SpriteLibrary;
 import input.Input;
 import map.GameMap;
 import settings.Settings;
+import world.World;
 
 import java.util.stream.Collectors;
 
 public class GameState extends State {
 
-    public GameState(Size windowSize, Input input, Character character, Player player, AudioPlayer audioPlayer, SpriteLibrary spriteLibrary, Log log, CursorManager cursorManager, UIController uiManager) {
-        super(windowSize, input, character, player, audioPlayer, spriteLibrary, log, cursorManager);
+    public GameState(Size windowSize, Input input, Character character, AudioPlayer audioPlayer, SpriteLibrary spriteLibrary, Log log, CursorManager cursorManager, UIController uiManager) {
+        super(windowSize, input, character, audioPlayer, spriteLibrary, log, cursorManager);
         input.setCamera(camera);
         gameMap = new GameMap(new Size(200,200),spriteLibrary);
         initializeCharacters();
@@ -35,11 +36,10 @@ public class GameState extends State {
         statusUpdate();
         respawn();
         super.update();
-        character.update();
 
         for(UI ui: uiManager.getUIList()){ ui.update();}
-        cursorManager.update(gameObjects.stream().filter(other -> player.mouseCollidesWith(other)).collect(Collectors.toList()));
-        player.handleClickOnGameObject(gameObjects.stream().filter(other -> player.mouseCollidesWith(other)).collect(Collectors.toList()));
+        cursorManager.update(gameObjects.stream().filter(other -> character.getGameObject().mouseCollidesWith(other)).collect(Collectors.toList()));
+        ((Player)character.getGameObject()).handleClickOnGameObject(gameObjects.stream().filter(other -> character.getGameObject().mouseCollidesWith(other)).collect(Collectors.toList()));
         handleMouseInput();
 
     }
@@ -71,9 +71,10 @@ public class GameState extends State {
     }
 
     private void initializeCharacters() {
-        player.setPosition(new Position(5 * Settings.SPRITE_SIZE_TILE, 5 * Settings.SPRITE_SIZE_TILE));
-        gameObjects.add(player);
-        camera.focusOn(player);
+        character.getGameObject().setPosition(new Position(5 * Settings.SPRITE_SIZE_TILE, 5 * Settings.SPRITE_SIZE_TILE));
+        gameObjects.add(character.getGameObject());
+        characters.add(character);
+        camera.focusOn(character.getGameObject());
 
         initializeNPCs(5);
     }
