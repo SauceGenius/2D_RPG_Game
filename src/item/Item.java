@@ -24,6 +24,9 @@ public abstract class Item {
     }
 
     //Setter & Getters
+    public void setName(String name){
+        this.name = name;
+    }
     public void setQuality(int qualityIndex){
         this.quality = qualityIndex;
     }

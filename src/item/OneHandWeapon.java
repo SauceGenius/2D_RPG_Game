@@ -1,8 +1,5 @@
 package item;
 
-import gfx.SpriteLibrary;
-import ui.tooltip.TooltipGenerator;
-
 import java.awt.*;
 
 public class OneHandWeapon extends Weapon {

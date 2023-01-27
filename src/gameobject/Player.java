@@ -44,9 +44,18 @@ public class Player extends MovingEntity {
         this.audioPlayer = audioPlayer;
 
         Item item1 = new OneHandWeapon(ItemId.wornShortSword, spriteLibrary.getIcon("inv_sword_34"));
+
         Item item2 = new OneHandWeapon(ItemId.wornShortSword, spriteLibrary.getIcon("inv_sword_34"));
-        ((EquipableItem)item2).setBinding(EquipableItem.BIND_ON_EQUIP);
+        item2.setName("Soul Crusher");
         item2.setQuality(ItemSettings.EPIC_QUALITY);
+        ((EquipableItem)item2).setItemLevel(60);
+        ((EquipableItem)item2).setBinding(EquipableItem.BIND_ON_EQUIP);
+        item2.getItemStat().setMinMeleeWeaponDamage(150);
+        item2.getItemStat().setMaxMeleeWeaponDamage(200);
+        item2.getItemStat().setStamina(20);
+        item2.getItemStat().setStrength(20);
+        ((EquipableItem)item2).setLevelRequired(60);
+
         inventory.addItem(item1);
         inventory.addItem(item2);
         inventory.addItem(item1);

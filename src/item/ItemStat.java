@@ -37,6 +37,9 @@ public class ItemStat {
 
     //Setters
     public void setMinMeleeWeaponDamage(int minMeleeWeaponDamage) {this.minMeleeWeaponDamage = minMeleeWeaponDamage;}
+    public void setMaxMeleeWeaponDamage(int maxMeleeWeaponDamage){
+        this.maxMeleeWeaponDamage = maxMeleeWeaponDamage;
+    }
     public void setStamina(int stamina) {this.stamina = stamina;}
     public void setStrength(int strength) {
         this.strength = strength;

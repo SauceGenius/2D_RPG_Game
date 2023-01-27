@@ -4,13 +4,9 @@ import item.*;
 import ui.Border;
 
 import java.awt.*;
+import java.text.DecimalFormat;
 
 public class TooltipGenerator {
-
-    public static final int ITEM = 0;
-    public static final int SPELL = 1;
-
-    private int type;
 
     public TooltipGenerator(){
 
@@ -41,7 +37,7 @@ public class TooltipGenerator {
         //Item Level
         TooltipLabel labelItemLevel = new TooltipLabel();
         labelItemLevel.setText(new String("Item Level ").concat(Integer.toString(((EquipableItem)item).getItemLevel())));
-        labelItemLevel.setColor(Color.yellow);
+        labelItemLevel.setColor(TooltipSettings.COLOR_TEXT_ITEM_LEVEL);
         labelItemLevel.setIndex(indexCount);
         tooltip.getTooltipBody().addLabel(labelItemLevel);
         indexCount++;
@@ -58,55 +54,83 @@ public class TooltipGenerator {
             indexCount++;
         }
 
-        //Weapon Type
-        TooltipLabel labelItemType = new TooltipLabel();
-        if(item instanceof Weapon) {
-            if (item instanceof OneHandWeapon) {
-                labelItemType.setText("One-Hand");
+        if (item instanceof EquipableItem){
+            /**Equippable Sub Type**/
+            TooltipLabel labelItemSubType = new TooltipLabel();
+            labelItemSubType.setText("Main-Hand"); /// TO IMPROVE
+            labelItemSubType.setIndex(indexCount);
+            tooltip.getTooltipBody().addLabel(labelItemSubType);
+
+            /**Equippable Type**/
+            TooltipLabelRight labelItemType = new TooltipLabelRight();
+            labelItemType.setText("Sword");
+            labelItemType.setIndex(indexCount);
+            tooltip.getTooltipBody().addLabel(labelItemType);
+            indexCount++;
+
+
+
+            if(item instanceof Weapon){
+                //Min and Max Damage
+                TooltipLabel labelDamage = new TooltipLabel();
+                labelDamage.setText(new String(Double.toString(item.getItemStat().getMinMeleeWeaponDamage()).concat(" - ").concat(Double.toString(item.getItemStat().getMaxMeleeWeaponDamage()).concat(" Damage"))));
+                labelDamage.setIndex(indexCount);
+                tooltip.getTooltipBody().addLabel(labelDamage);
+
+                //Speed
+                TooltipLabelRight labelSpeed = new TooltipLabelRight();
+                DecimalFormat formatter = new DecimalFormat("#0.00");
+                labelSpeed.setText(new String("Speed ").concat(formatter.format(((Weapon)item).getItemStat().getAttackSpeed())));
+                labelSpeed.setIndex(indexCount);
+                tooltip.getTooltipBody().addLabel(labelSpeed);
+                indexCount++;
+
+                //Damage per second
+                TooltipLabel labelDps = new TooltipLabel();
+                labelDps.setText(new String("(").concat(formatter.format(((Weapon) item).getDps())).concat(" damage per second)"));
+                labelDps.setIndex(indexCount);
+                tooltip.getTooltipBody().addLabel(labelDps);
+                indexCount++;
             }
+            //Stamina
+            if(item.getItemStat().getStamina() > 0){
+                TooltipLabel labelStamina = new TooltipLabel();
+                labelStamina.setText(new String("+").concat(Integer.toString(item.getItemStat().getStamina())).concat(" Stamina"));
+                labelStamina.setIndex(indexCount);
+                tooltip.getTooltipBody().addLabel(labelStamina);
+                indexCount++;
+            }
+
+            //Strength
+            if(item.getItemStat().getStrength() > 0){
+                TooltipLabel labelStrength = new TooltipLabel();
+                labelStrength.setText(new String("+").concat(Integer.toString(item.getItemStat().getStrength())).concat(" Strength"));
+                labelStrength.setIndex(indexCount);
+                tooltip.getTooltipBody().addLabel(labelStrength);
+                indexCount++;
+            }
+
+            //Durability
+            TooltipLabel labelDurability = new TooltipLabel();
+            labelDurability.setText(new String("Durability ").concat(Integer.toString(((OneHandWeapon) item).getDurability())).concat(" / ").concat(Integer.toString(((OneHandWeapon) item).getMaxDurability())));
+            labelDurability.setIndex(indexCount);
+            tooltip.getTooltipBody().addLabel(labelDurability);
+            indexCount++;
+
+            //Level Requirement
+            if(((EquipableItem) item).getLevelRequired() > 0){
+                TooltipLabel labelLevelRequired = new TooltipLabel();
+                labelLevelRequired.setText(new String("Requires Level ").concat(Integer.toString(((EquipableItem) item).getLevelRequired())));
+                labelLevelRequired.setIndex(indexCount);
+                tooltip.getTooltipBody().addLabel(labelLevelRequired);
+                indexCount++;
+            }
+        } else {
+
         }
-        labelItemType.setIndex(indexCount);
-        tooltip.getTooltipBody().addLabel(labelItemType);
-        indexCount++;
-
-        //Min and Max Damage
-        TooltipLabel labelDamage = new TooltipLabel();
-        labelDamage.setText(new String(Integer.toString(((Weapon)item).getMinDamage())).concat(" - ").concat(Integer.toString(((Weapon)item).getMaxDamage())).concat(" Damage"));
-        labelDamage.setIndex(indexCount);
-        tooltip.getTooltipBody().addLabel(labelDamage);
-
-        //Speed
-        TooltipLabelRight labelSpeed = new TooltipLabelRight();
-        labelSpeed.setText(new String("Speed ").concat(Double.toString(((Weapon)item).getItemStat().getAttackSpeed())));
-        labelSpeed.setIndex(indexCount);
-        tooltip.getTooltipBody().addLabel(labelSpeed);
-        indexCount++;
-
-        //Damage per second
-        TooltipLabel labelDps = new TooltipLabel();
-        labelDps.setText(new String("(").concat(Double.toString(((Weapon) item).getDps())).concat(" damage per second)"));
-        labelDps.setIndex(indexCount);
-        tooltip.getTooltipBody().addLabel(labelDps);
-        indexCount++;
-
-        //Durability
-        TooltipLabel labelDurability = new TooltipLabel();
-        labelDurability.setText(new String("Durability ").concat(Integer.toString(((OneHandWeapon) item).getDurability())).concat(" / ").concat(Integer.toString(((OneHandWeapon) item).getMaxDurability())));
-        labelDurability.setIndex(indexCount);
-        tooltip.getTooltipBody().addLabel(labelDurability);
-        indexCount++;
-
-        ///TEST
-        TooltipLabel labelTest = new TooltipLabel();
-        labelTest.setText("Sell Price: 7");
-        labelTest.setIndex(indexCount);
-        tooltip.getTooltipBody().addLabel(labelTest);
-        indexCount++;
 
         //Set Dimension
-        //int height = TooltipSettings.LABEL_TEXT_MARGIN_VERTICAL
-        int height = TooltipSettings.TOOLTIP_ARC_HEIGHT * 2 + indexCount * TooltipSettings.LABEL_TEXT_SPACING + 1;
-
+        int height = TooltipSettings.TOOLTIP_ARC_HEIGHT * 2 + indexCount * TooltipSettings.LABEL_TEXT_SPACING + 2;
         tooltip.getTooltipBody().setDimension(new Dimension(TooltipSettings.ITEM_TOOLTIP_WIDTH,height));
 
         //Set Border
