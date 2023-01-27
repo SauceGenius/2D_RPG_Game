@@ -7,9 +7,7 @@ import controller.PlayerController;
 import core.CollisionBox;
 import core.Log;
 import equipment.Equipment;
-import item.Item;
-import item.ItemId;
-import item.OneHandWeapon;
+import item.*;
 import stats.Stats;
 import core.Timer;
 import game.state.State;
@@ -45,14 +43,17 @@ public class Player extends MovingEntity {
         this.autoAttackTimer = new Timer(1);
         this.audioPlayer = audioPlayer;
 
-        Item item = new OneHandWeapon(ItemId.wornShortSword, spriteLibrary.getIcon("inv_sword_34"));
-        inventory.addItem(item);
-        inventory.addItem(item);
-        inventory.addItem(item);
-        inventory.addItem(item);
-        inventory.addItem(item);
-        inventory.addItem(item);
-        inventory.addItem(item);
+        Item item1 = new OneHandWeapon(ItemId.wornShortSword, spriteLibrary.getIcon("inv_sword_34"));
+        Item item2 = new OneHandWeapon(ItemId.wornShortSword, spriteLibrary.getIcon("inv_sword_34"));
+        ((EquipableItem)item2).setBinding(EquipableItem.BIND_ON_EQUIP);
+        item2.setQuality(ItemSettings.EPIC_QUALITY);
+        inventory.addItem(item1);
+        inventory.addItem(item2);
+        inventory.addItem(item1);
+        inventory.addItem(item2);
+        inventory.addItem(item1);
+        inventory.addItem(item2);
+        inventory.addItem(item1);
     }
 
     //Methods

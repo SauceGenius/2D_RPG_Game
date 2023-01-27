@@ -3,27 +3,27 @@ package ui.inventoryui;
 import audio.AudioPlayer;
 import core.Position;
 import inventory.Inventory;
-import item.Item;
 import ui.UI;
-import ui.button.ItemIcon;
+import ui.tooltip.TooltipGenerator;
 
 import java.awt.*;
-import java.util.ArrayList;
-;
 
 public class InventoryUI extends UI {
 
     private static final int INVENTORY_SIZE = 16;
     private InventorySlot[] inventorySlots;
     private Inventory inventory;
+    private TooltipGenerator tooltipGenerator;
 
     public InventoryUI(Inventory inventory) {
-        opened = false;
-        this.inventory = inventory;
+        this.opened = false;
+        this.position = new Position(1600,700);
+        this.dimension = new Dimension(180,220);
         Toolkit toolkit = Toolkit.getDefaultToolkit();
-        Image bagImage = toolkit.getImage("resources/sprites/ui/Inventory.png");
-        images.add(bagImage);
-        position = new Position(1600,700);
+        this.images.add(toolkit.getImage("resources/sprites/ui/Inventory.png"));
+        this.inventory = inventory;
+        this.tooltipGenerator = new TooltipGenerator();
+
         inventorySlots = new InventorySlot[INVENTORY_SIZE];
         for(int i = 0; i < INVENTORY_SIZE; i++) inventorySlots[i] = new InventorySlot(i, position);
     }
@@ -48,7 +48,7 @@ public class InventoryUI extends UI {
             //Tooltip
             for(int i = 0; i < INVENTORY_SIZE; i++){
                 if(inventorySlots[i].mouseIsOver() && inventorySlots[i].getItem() != null && !inventorySlots[i].getItem().getItemIcon().isDragged()){
-                    inventorySlots[i].getItem().getTooltip().render(graphics, inventorySlots[i].getPosition());
+                    tooltipGenerator.generateItemTooltip(inventorySlots[i].getItem()).render(graphics, inventorySlots[i].getPosition());
                 }
             }
         }
@@ -65,29 +65,7 @@ public class InventoryUI extends UI {
         }
     }
 
-    public void addItem(Item item){
-        for(int i = 0; i < INVENTORY_SIZE; i++){
-            if(inventorySlots[i].getItem() == null){
-                inventorySlots[i].setItem(item);
-            }
-        }
-    }
-
     public InventorySlot[] getInventorySlots() {
         return inventorySlots;
-    }
-
-    public ArrayList<ItemIcon> getItemIcons(){
-        ArrayList<ItemIcon> itemIcons = new ArrayList<>();
-        for (int i = 0; i < inventorySlots.length; i++){
-            if(inventorySlots[i].getItemIcon() != null){
-                itemIcons.add(inventorySlots[i].getItemIcon());
-            }
-        }
-        return itemIcons;
-    }
-
-    public Inventory getInventory() {
-        return inventory;
     }
 }

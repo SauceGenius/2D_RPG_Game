@@ -4,23 +4,23 @@ import core.Position;
 
 import java.awt.*;
 
-public class CLabel {
+public class TooltipLabel {
 
-    private int index;
-    private String text;
-    private Color color;
-    private Font font;
+    protected int index;
+    protected String text;
+    protected Color color;
+    protected Font font;
 
 
-    public CLabel(){
-
+    public TooltipLabel(){
+        this.color = TooltipSettings.COLOR_TEXT_DEFAULT;
+        this.font = TooltipSettings.FONT_ITEM_TEXT_DEFAULT;
     }
 
     public void render(Graphics graphics, Position tooltipPosition){
-        int margin = 18;
         graphics.setColor(color);
         graphics.setFont(font);
-        graphics.drawString(text, tooltipPosition.intX() + 10,tooltipPosition.intY() + 20 + margin * index );
+        graphics.drawString(text, tooltipPosition.intX() + TooltipSettings.LABEL_TEXT_MARGIN_HORIZONTAL,tooltipPosition.intY() + TooltipSettings.LABEL_TEXT_MARGIN_VERTICAL + TooltipSettings.FONT_ITEM_NAME.getSize() + TooltipSettings.LABEL_TEXT_SPACING * index);
     }
 
     public void setIndex(int index){

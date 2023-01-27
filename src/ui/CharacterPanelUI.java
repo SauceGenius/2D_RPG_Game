@@ -87,7 +87,7 @@ public class CharacterPanelUI extends UI {
                     graphics.setColor(Color.white);
                     graphics.drawString(Integer.toString(x + y * 2 + 3), x * 268 + position.intX()+ 5, y * 36 + position.intY() + 102);
                     if (player.getEquipment().getEquipment()[(x + y * 2 + 3)] != null) {
-                        player.getEquipment().getItem(x + y * 2 + 3).render(graphics, new Position(x * 268 + position.intX() + 5, y * 32 + position.intY() + 70), false);
+                        player.getEquipment().getItem(x + y * 2 + 3).render(graphics, new Position(x * 268 + position.intX() + 5, y * 32 + position.intY() + 70));
                     }
                 }
             }
@@ -99,13 +99,13 @@ public class CharacterPanelUI extends UI {
             graphics.drawRect(position.intX() + 136, position.intY() + 350, 32, 32);
             graphics.drawRect(position.intX() + 172, position.intY() + 350, 32, 32);
             if(player.getEquipment().getItem(0) != null){
-                player.getEquipment().getItem(0).render(graphics, new Position(position.intX() + 100, position.intY() + 350), false);
+                player.getEquipment().getItem(0).render(graphics, new Position(position.intX() + 100, position.intY() + 350));
             }
             if(player.getEquipment().getItem(1) != null){
-                player.getEquipment().getItem(0).render(graphics, new Position(position.intX() + 134, position.intY() + 350),false);
+                player.getEquipment().getItem(0).render(graphics, new Position(position.intX() + 134, position.intY() + 350));
             }
             if(player.getEquipment().getItem(2) != null){
-                player.getEquipment().getItem(0).render(graphics, new Position(position.intX() + 135, position.intY() + 350),false);
+                player.getEquipment().getItem(0).render(graphics, new Position(position.intX() + 135, position.intY() + 350));
             }
         }
     }

@@ -163,6 +163,10 @@ public class UIController implements InputObserver {
 
     @Override
     public void notifyMousePressed(MouseEvent mouseEvent) {
+        /*if(uiList.get(INVENTORY).getCollisionBox().collidesWith(new CollisionBox(new Rectangle(mouseEvent.getX() - 2, mouseEvent.getY() - 2, 4, 4))))
+            uiList.get(INVENTORY).mousePressedOnUI();*/
+
+
         draggingItem = true;
         InventorySlot[] inventorySlots = ((InventoryUI)(uiList.get(INVENTORY))).getInventorySlots();
         for(int i = 0; i < inventorySlots.length; i++){

@@ -1,6 +1,7 @@
 package ui;
 
 import audio.AudioPlayer;
+import core.CollisionBox;
 import core.Position;
 import ui.button.CButton;
 
@@ -11,6 +12,7 @@ public abstract class UI {
 
     protected boolean opened;
     protected Position position;
+    protected Dimension dimension;
     protected ArrayList<Image> images;
     protected ArrayList<String> texts;
     protected AudioPlayer audioPlayer;
@@ -20,6 +22,12 @@ public abstract class UI {
         images = new ArrayList<>();
         texts = new ArrayList<>();
         buttons = new ArrayList<>();
+    }
+
+    //public abstract void mousePressedOnUI();
+
+    public CollisionBox getCollisionBox(){
+        return new CollisionBox(new Rectangle(position.intX(), position.intY(), dimension.width, dimension.height));
     }
 
     public ArrayList<Image> getImages() {

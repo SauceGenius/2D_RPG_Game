@@ -13,8 +13,6 @@ public abstract class Weapon extends EquipableItem{
 
     public Weapon(ItemId itemId, Image image) {
         super(itemId, image);
-
-        this.equipable = true;
     }
 
     //Getters

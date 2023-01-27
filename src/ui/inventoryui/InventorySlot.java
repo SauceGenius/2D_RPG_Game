@@ -35,7 +35,7 @@ public class InventorySlot {
     public void render(Graphics graphics) {
         if(item != null){
             if (mouseOver){
-                item.render(graphics, position, true);
+                item.render(graphics, position);
 
                 int arcW = 8;
                 int arcH = 8;
@@ -45,7 +45,7 @@ public class InventorySlot {
                 graphics.fillRect(position.intX(), position.intY(), slotWidth, slotHeight);
 
             } else {
-                item.render(graphics, position, false);
+                item.render(graphics, position);
             }
         }
 

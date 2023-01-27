@@ -27,7 +27,7 @@ public class GameState extends State {
         input.setCamera(camera);
         gameMap = new GameMap(new Size(200,200),spriteLibrary);
         initializeCharacters();
-        audioPlayer.playMusic("ElwynnForest.wav");
+        //audioPlayer.playMusic("ElwynnForest.wav");
         this.uiManager = uiManager;
     }
 

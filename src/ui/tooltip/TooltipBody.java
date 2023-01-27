@@ -7,10 +7,8 @@ import java.util.ArrayList;
 
 public class TooltipBody {
 
-    public static final Color color = new Color(10,10,30,210);
-
     private Dimension dimension;
-    private ArrayList<CLabel> labels;
+    private ArrayList<TooltipLabel> labels;
 
     public TooltipBody(){
         this.dimension = new Dimension(0,0);
@@ -18,12 +16,12 @@ public class TooltipBody {
     }
 
     public void render(Graphics graphics, Position tooltipPosition){
-        graphics.setColor(color);
-        graphics.fillRoundRect(tooltipPosition.intX(), tooltipPosition.intY(), dimension.width, dimension.height, Tooltip.TOOLTIP_ARC_WIDTH, Tooltip.TOOLTIP_ARC_HEIGHT);
+        graphics.setColor(TooltipSettings.COLOR_BACKGROUND_DEFAULT);
+        graphics.fillRoundRect(tooltipPosition.intX(), tooltipPosition.intY(), dimension.width, dimension.height, TooltipSettings.TOOLTIP_ARC_WIDTH, TooltipSettings.TOOLTIP_ARC_HEIGHT);
         labels.forEach(label -> {label.render(graphics, tooltipPosition);});
     }
 
-    public void addLabel(CLabel label){
+    public void addLabel(TooltipLabel label){
         labels.add(label);
     }
 

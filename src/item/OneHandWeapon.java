@@ -17,6 +17,7 @@ public class OneHandWeapon extends Weapon {
 
     private void createWornShortSword(){
         this.name = "Worn Shortsword";
+        this.quality = ItemSettings.COMMON_QUALITY;
         this.itemStat = new ItemStat(itemId, 1,3,1.9,0,0,0,0,0,0);
         this.speed = 1.9;
         this.minDamage = 1;
@@ -25,6 +26,6 @@ public class OneHandWeapon extends Weapon {
         this.itemLevel = 2;
         this.maxDurability = 20;
         this.durability = maxDurability;
-        this.tooltip = new TooltipGenerator().generateItemTooltip(this);
+        //this.tooltip = new TooltipGenerator().generateItemTooltip(this);
     }
 }
