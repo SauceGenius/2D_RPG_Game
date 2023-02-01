@@ -1,48 +1,57 @@
 package equipment;
 
-import controller.PlayerController;
-import item.Item;
-import item.ItemId;
-import item.OneHandWeapon;
-import gfx.SpriteLibrary;
+import item.*;
 
 public class Equipment {
-    private boolean isOpen;
+
+    public static final int MAIN_HAND = 0;
+    public static final int OFF_HAND = 1;
+    public static final int RANGED = 2;
+    public static final int AMMUNITION = 3;
+    public static final int HEAD = 4;
+    public static final int NECK = 5;
+    public static final int SHOULDER = 6;
+    public static final int BACK = 7;
+    public static final int CHEST = 8;
+    public static final int SHIRT = 9;
+    public static final int TABARD = 10;
+    public static final int WRIST = 11;
+    public static final int HANDS = 12;
+    public static final int WAIST = 13;
+    public static final int LEGS = 14;
+    public static final int FOOT = 15;
+    public static final int FINGER_1 = 16;
+    public static final int FINGER_2 = 17;
+    public static final int OTHER_1 = 18;
+    public static final int OTHER_2 = 19;
+
     private int size = 20;
-    private PlayerController playerController;
-    private Item equipment[];
+    private Item equippedItems[];
 
 
-    public Equipment(PlayerController playerController, SpriteLibrary spriteLibrary){
-        this.isOpen = false;
-        this.playerController = playerController;
-        this.equipment = new Item[size];
-        equipment[0] = (Item) new OneHandWeapon(ItemId.wornShortSword, spriteLibrary.getIcon("inv_sword_34"));
+    public Equipment(){
+        this.equippedItems = new Item[size];
     }
 
-    public void update() {
-
-    }
-
-    public Item getItem(int i) {
-        return equipment[i];
-    }
-
-    public void equips(Item item){
-        if(item.getId() == ItemId.wornShortSword){
-            equipment[0] = item;
+    public void equip(EquipableItem item){
+        if(item instanceof Weapon){
+            equippedItems[0] = item;
         }
     }
 
-    public boolean isOpen() {
-        return isOpen;
+    public void unequip(int index) {
+        equippedItems[index] = null;
+    }
+
+    public Item getItem(int i) {
+        return equippedItems[i];
     }
 
     public int getTotalStrengthBonus(){
         int strength = 0;
         for(int i = 0; i < size; i++){
-            if(equipment[i] != null){
-                strength += equipment[i].getItemStat().getStrength();
+            if(equippedItems[i] != null){
+                strength += equippedItems[i].getItemStat().getStrength();
             }
         }
         return strength;
@@ -51,8 +60,8 @@ public class Equipment {
     public int getTotalIntellectBonus(){
         int intellect = 0;
         for(int i = 0; i < size; i++){
-            if(equipment[i] != null){
-                intellect += equipment[i].getItemStat().getStrength();
+            if(equippedItems[i] != null){
+                intellect += equippedItems[i].getItemStat().getIntellect();
             }
         }
         return intellect;
@@ -61,8 +70,8 @@ public class Equipment {
     public int getTotalAgilityBonus(){
         int agility = 0;
         for(int i = 0; i < size; i++){
-            if(equipment[i] != null){
-                agility += equipment[i].getItemStat().getStrength();
+            if(equippedItems[i] != null){
+                agility += equippedItems[i].getItemStat().getAgility();
             }
         }
         return agility;
@@ -71,8 +80,8 @@ public class Equipment {
     public int getTotalDefenseBonus(){
         int Defense = 0;
         for(int i = 0; i < size; i++){
-            if(equipment[i] != null){
-                Defense += equipment[i].getItemStat().getStrength();
+            if(equippedItems[i] != null){
+                Defense += equippedItems[i].getItemStat().getDefense();
             }
         }
         return Defense;
@@ -81,8 +90,8 @@ public class Equipment {
     public int getTotalArmorBonus(){
         int Armor = 0;
         for(int i = 0; i < size; i++){
-            if(equipment[i] != null){
-                Armor += equipment[i].getItemStat().getStrength();
+            if(equippedItems[i] != null){
+                Armor += equippedItems[i].getItemStat().getArmor();
             }
         }
         return Armor;
@@ -91,8 +100,8 @@ public class Equipment {
     public int getTotalMinMeleeWeaponDamage(){
         int minMeleeWeaponDamage = 0;
         for(int i = 0; i < size; i++){
-            if(equipment[i] != null && equipment[i].getId() == ItemId.wornShortSword){
-                minMeleeWeaponDamage += equipment[i].getItemStat().getMinMeleeWeaponDamage();
+            if(equippedItems[i] != null && equippedItems[i].getId() == ItemId.wornShortSword){
+                minMeleeWeaponDamage += equippedItems[i].getItemStat().getMinMeleeWeaponDamage();
             }
         }
         return minMeleeWeaponDamage;
@@ -101,8 +110,8 @@ public class Equipment {
     public int getTotalMaxMeleeWeaponDamage(){
         int maxMeleeWeaponDamage = 0;
         for(int i = 0; i < size; i++){
-            if(equipment[i] != null && equipment[i].getId() == ItemId.wornShortSword){
-                maxMeleeWeaponDamage += equipment[i].getItemStat().getMaxMeleeWeaponDamage();
+            if(equippedItems[i] != null && equippedItems[i].getId() == ItemId.wornShortSword){
+                maxMeleeWeaponDamage += equippedItems[i].getItemStat().getMaxMeleeWeaponDamage();
             }
         }
         return maxMeleeWeaponDamage;
@@ -110,16 +119,24 @@ public class Equipment {
 
     public double getMeleeAttackSpeed(){
         int meleeAttackSpeed = 0;
-        if(equipment[0] != null) {
-            meleeAttackSpeed += equipment[0].getItemStat().getAttackSpeed();
+        if(equippedItems[0] != null) {
+            meleeAttackSpeed += equippedItems[0].getItemStat().getAttackSpeed();
         }
 
         return meleeAttackSpeed;
     }
 
-    public Item[] getEquipment() {return equipment;}
+    public Item[] getEquippedItems() {
+        return equippedItems;
+    }
 
     public int getTotalStaminaBonus() {
-        return 0;
+        int stamina = 0;
+        for(int i = 0; i < size; i++){
+            if(equippedItems[i] != null){
+                stamina += equippedItems[i].getItemStat().getStamina();
+            }
+        }
+        return stamina;
     }
 }

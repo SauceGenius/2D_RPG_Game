@@ -29,14 +29,27 @@ public class Timer {
         seconds = (double) updatesCountDown / (double) GameLoop.UPDATES_PER_SECOND;
     }
 
-    public void startClock(double seconds){
+    public void startClockSeconds(double seconds){
         this.seconds = seconds;
         updatesCountDown = (int) (seconds * GameLoop.UPDATES_PER_SECOND);
     }
 
-    //Getters
-    public boolean timeIsUp() {return timesUp;}
-    public int getUpdatesCountDown() {return updatesCountDown;}
-    public double getSecondsCountDown() {return seconds;}
+    public void startClockUpdates(int updates){
+        updatesCountDown = updates;
+        seconds = (int) ((double)updatesCountDown / (double)GameLoop.UPDATES_PER_SECOND);
+    }
+
+    /** Getters **/
+    public boolean timeIsUp() {
+        return timesUp;
+    }
+
+    public int getUpdatesCountDown() {
+        return updatesCountDown;
+    }
+
+    public double getSecondsCountDown() {
+        return seconds;
+    }
 }
 

@@ -53,7 +53,15 @@ public class Level {
                 stats.gain("agility",1, log);
             }
 
-            stats.setMaxHpValue((level - 1) * 9 + (stats.getBaseStat("stamina") - 20) * 10 + 40 + equipment.getTotalStaminaBonus());
+            /** Numbers are to be confirmed **/
+            else if (raceId == RaceId.human && gameClassId == GameClassId.Paladin){
+                log.addToGeneral("LevelUp", "You have gained " + (1 * 10 + 9) + " hit points.");
+                stats.gain("stamina", 1, log);
+                stats.gain("strength",1, log);
+                stats.gain("agility",1, log);
+            }
+
+            stats.setMaxHpValue((level - 1) * 9 + (stats.getBaseStat(Stats.STAMINA) - 20) * 10 + 40 + equipment.getTotalStaminaBonus());
             stats.setCurrentHpValue(stats.getMaxHpValue());
         }
     }

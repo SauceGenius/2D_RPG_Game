@@ -7,7 +7,6 @@ import controller.PlayerController;
 import core.CollisionBox;
 import core.Log;
 import equipment.Equipment;
-import item.*;
 import stats.Stats;
 import core.Timer;
 import game.state.State;
@@ -30,7 +29,7 @@ public class Player extends MovingEntity {
     //TO REMOVE
     private Inventory inventory;
 
-    //Constructor
+    /** Constructor **/
     public Player(String userName, MovementController controller, AudioPlayer audioPlayer, Stats stats, Inventory inventory, Equipment equipment, SpriteLibrary spriteLibrary, Log log){
         super(controller, audioPlayer, spriteLibrary, log);
         this.playerController = (PlayerController) controller;
@@ -38,34 +37,13 @@ public class Player extends MovingEntity {
         this.stats = stats;
         this.inventory = inventory;
         this.name = userName;
-        this.animationManager = new AnimationManager(stats, status, controller, spriteLibrary.getUnit("player"));
+        this.animationManager = new AnimationManager(this, stats, status, controller, spriteLibrary.getUnit("player"));
         this.equipment = equipment;
-        this.autoAttackTimer = new Timer(1);
+        this.autoAttackTimer = new Timer(0.1);
         this.audioPlayer = audioPlayer;
-
-        Item item1 = new OneHandWeapon(ItemId.wornShortSword, spriteLibrary.getIcon("inv_sword_34"));
-
-        Item item2 = new OneHandWeapon(ItemId.wornShortSword, spriteLibrary.getIcon("inv_sword_34"));
-        item2.setName("Soul Crusher");
-        item2.setQuality(ItemSettings.EPIC_QUALITY);
-        ((EquipableItem)item2).setItemLevel(60);
-        ((EquipableItem)item2).setBinding(EquipableItem.BIND_ON_EQUIP);
-        item2.getItemStat().setMinMeleeWeaponDamage(150);
-        item2.getItemStat().setMaxMeleeWeaponDamage(200);
-        item2.getItemStat().setStamina(20);
-        item2.getItemStat().setStrength(20);
-        ((EquipableItem)item2).setLevelRequired(60);
-
-        inventory.addItem(item1);
-        inventory.addItem(item2);
-        inventory.addItem(item1);
-        inventory.addItem(item2);
-        inventory.addItem(item1);
-        inventory.addItem(item2);
-        inventory.addItem(item1);
     }
 
-    //Methods
+    /** Methods **/
     @Override
     public void update(State state) {
         manageDirection();
@@ -76,6 +54,7 @@ public class Player extends MovingEntity {
         stats.update(equipment, audioPlayer, log);
         status.setHasTargetInReach(false);
         updateTarget();
+        status.update();
     }
 
     @Override
@@ -83,7 +62,7 @@ public class Player extends MovingEntity {
         if (isDead()) {animationManager.playAnimation("Dying");}
         else if (isAutoAttacking()) {animationManager.playAutoAttackAnimation();}
         else if (motion.isMoving()) {animationManager.playAnimation("Run");}
-        else if (isHurt()) {animationManager.playAnimation("Hurt");}
+        else if (status.isHurt()) {animationManager.playAnimation("Hurt");}
         else {animationManager.playAnimation("Idle");}
     }
 
@@ -145,11 +124,25 @@ public class Player extends MovingEntity {
     protected void handleDetectionCollisions(GameObject otherGameObject) {}
 
     public void handleClickOnGameObject(List<GameObject> gameObjects) {
-        if(playerController.isClicking()){
+
+        /** Left-clicking on mob **/
+        if(playerController.isLeftClicking()){
             for(GameObject other: gameObjects){
                 if(other instanceof NPC){
                     if(!other.isDead()) {
                         targets((MovingEntity) other);
+                    }
+                }
+            }
+        }
+
+        /** Right-clicking on mob **/
+        else if (playerController.isRightClicking()){
+            for(GameObject other: gameObjects){
+                if(other instanceof NPC){
+                    if(!other.isDead()) {
+                        targets((MovingEntity) other);
+                        status.setInCombat(true);
                     } else if(playerController.isRightClicking()){
                         loots((NPC)other);
                     }
@@ -184,7 +177,7 @@ public class Player extends MovingEntity {
             if (status.hasTargetInReach()) {
                 if (autoAttackTimer.timeIsUp()) {
                     //Activate auto attack
-                    autoAttackTimer.startClock(stats.getAttackSpeed());
+                    autoAttackTimer.startClockSeconds(stats.getAttackSpeed());
                     setIsAutoAttacking(true);
                 }
             }
@@ -206,7 +199,7 @@ public class Player extends MovingEntity {
 
     public double attackDamage(boolean isCrit){
 
-        double AP = (double)stats.getTotalStrength() * 2 + (double)stats.getLevelValue() * 3 - 20;
+        double AP = (double)stats.getStat(Stats.STRENGTH) * 2 + (double)stats.getLevelValue() * 3 - 20;
         double dpsFromAP = AP / 14;
         double damageFromAP = dpsFromAP * stats.getAttackSpeed();
         double minDamage = stats.getMinMeleeWeaponDamage() + damageFromAP;
@@ -235,6 +228,30 @@ public class Player extends MovingEntity {
     }
 
     @Override
+    protected void dies() {}
+
+    /** Setters **/
+    @Override
+    public void isHit(GameObject attackerObject, int damage) {
+        status.setIsHurt(true);
+        playerController.loseHP(damage);
+    }
+
+    public void setTarget(MovingEntity target) {
+        this.target = target;
+    }
+
+    public void setIsAutoAttacking(boolean isAutoAttacking) {
+        status.setIsAutoAttacking(isAutoAttacking);
+    }
+
+    public void setAudioPlayer(AudioPlayer audioPlayer) {
+        this.audioPlayer = audioPlayer;
+    }
+
+
+    /** Getters **/
+    @Override
     public boolean isDead() {
         return false;
     }
@@ -246,21 +263,32 @@ public class Player extends MovingEntity {
     public boolean hasBeenLooted() {
         return false;
     }
-    @Override
-    public boolean isInReach() {return false;}
-    @Override
-    protected void dies() {}
 
-    //Setters
-    public void setTarget(MovingEntity target) {this.target = target;}
-    public void setIsAutoAttacking(boolean isAutoAttacking) {status.setIsAutoAttacking(isAutoAttacking);}
-    public void setAudioPlayer(AudioPlayer audioPlayer) {this.audioPlayer = audioPlayer;}
+    @Override
+    public boolean isInReach() {
+        return false;
+    }
 
-    //Getters
-    public Stats getStats() {return stats;}
-    public Equipment getEquipment() {return equipment;}
-    public PlayerController getPlayerController(){return this.playerController;}
-    public MovingEntity getTarget() {return target;}
-    public boolean isAutoAttacking() {return status.isAutoAttacking();}
-    public Timer getAutoAttackTimer() {return autoAttackTimer;}
+    public Stats getStats() {
+        return stats;
+    }
+
+    public Equipment getEquipment() {
+        return equipment;
+    }
+
+    public PlayerController getPlayerController(){
+        return this.playerController;
+    }
+    public MovingEntity getTarget() {
+        return target;
+    }
+
+    public boolean isAutoAttacking() {
+        return status.isAutoAttacking();
+    }
+
+    public Timer getAutoAttackTimer() {
+        return autoAttackTimer;
+    }
 }

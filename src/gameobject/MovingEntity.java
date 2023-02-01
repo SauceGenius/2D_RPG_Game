@@ -28,7 +28,6 @@ public abstract class MovingEntity extends GameObject {
         this.audioPlayer = audioPlayer;
         this.motion = new Motion(3);
         this.direction = Direction.S;
-        this.status = new Status();
         this.spriteLibrary = spriteLibrary;
     }
 
@@ -90,10 +89,21 @@ public abstract class MovingEntity extends GameObject {
     protected abstract void handleDetectionCollisions(GameObject gameObject);
 
 
-    // Setters and getters
+    /** Getters **/
     @Override
-    public Image getSprite() {return animationManager.getSprite();}
-    public MovementController getController() {return controller;}
-    public Motion getMotion() {return motion;}
-    public AnimationManager getAnimationManager() {return animationManager;}
+    public Image getSprite() {
+        return animationManager.getSprite();
+    }
+
+    public MovementController getController() {
+        return controller;
+    }
+
+    public Motion getMotion() {
+        return motion;
+    }
+
+    public AnimationManager getAnimationManager() {
+        return animationManager;
+    }
 }

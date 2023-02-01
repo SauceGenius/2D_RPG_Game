@@ -73,7 +73,7 @@ public class TooltipGenerator {
             if(item instanceof Weapon){
                 //Min and Max Damage
                 TooltipLabel labelDamage = new TooltipLabel();
-                labelDamage.setText(new String(Double.toString(item.getItemStat().getMinMeleeWeaponDamage()).concat(" - ").concat(Double.toString(item.getItemStat().getMaxMeleeWeaponDamage()).concat(" Damage"))));
+                labelDamage.setText(new String(String.format("%.0f",item.getItemStat().getMinMeleeWeaponDamage()).concat(" - ").concat(String.format("%.0f",item.getItemStat().getMaxMeleeWeaponDamage()).concat(" Damage"))));
                 labelDamage.setIndex(indexCount);
                 tooltip.getTooltipBody().addLabel(labelDamage);
 

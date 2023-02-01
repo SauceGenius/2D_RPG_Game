@@ -89,12 +89,12 @@ public class Log {
 
             criticalDamageFloatingText[0][i] = damageLog[0][i];
         }
-        criticalDamageFloatingTextTimer.startClock(3);
+        criticalDamageFloatingTextTimer.startClockSeconds(3);
     }
 
     private void updateDamageFloatingText() {
         if (damageFloatingTextTimer.timeIsUp()) {
-            damageFloatingTextTimer.startClock(0.05);
+            damageFloatingTextTimer.startClockSeconds(0.05);
             for (int i = damageFloatingText.length - 1; i > 0; i--) {
                 for (int j = 0; j < 7; j++) {
                     if (i == damageFloatingText.length - 1) {

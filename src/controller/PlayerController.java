@@ -1,18 +1,45 @@
 package controller;
 
+import character.Character;
 import core.Position;
 import input.Input;
 import input.InputObserver;
+import item.EquipableItem;
+import item.Item;
+import item.Weapon;
+import ui.UIManagerObserver;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 
-public class PlayerController implements MovementController, InputObserver {
+public class PlayerController implements MovementController, InputObserver, UIManagerObserver {
 
     private Input input;
+    private Character character;
 
     public PlayerController(Input input){
         this.input = input;
+    }
+
+    private void equip(EquipableItem item, int indexFrom){
+        if(item instanceof Weapon){
+            if(!character.getGameObject().getStatus().isInCombat()){
+                Item equippedItem = character.getEquipment().getItem(0);
+                character.getEquipment().equip(item);
+                character.getInventory().exchangeItem(indexFrom, equippedItem);
+            } else {
+                System.out.println("Cant equip while in combat");
+            }
+        }
+    }
+
+    private void unequip(Item item, int index) {
+        character.getEquipment().unequip(index);
+        character.getInventory().addItem(item);
+    }
+
+    public void loseHP(int damage) {
+        character.getStats().getHp().setCurrentHp(character.getStats().getCurrentHpValue() - damage);
     }
 
     @Override
@@ -60,9 +87,36 @@ public class PlayerController implements MovementController, InputObserver {
     @Override
     public boolean isRequestingSprint() {return input.isPressed(KeyEvent.VK_SHIFT);}
 
-    public boolean isClicking() {return input.isMouseClicked();}
+    public boolean isLeftClicking() {return input.isMouseLeftClicked();}
 
     public boolean isRightClicking() {return input.isMouseRightClicked();}
 
-    public Position getMousePosition() {return input.getMousePosition();}
+    public Position getMousePosition() {return input.getMousePositionRelativeToCamera();}
+
+    @Override
+    public void notifyRightClickedOnItemInInventory(Item item, int indexFrom) {
+        if(item instanceof EquipableItem){
+            equip((EquipableItem) item, indexFrom);
+        }
+    }
+
+    @Override
+    public void notifyRightClickedOnItemInCharacterPanel(Item item, int index) {
+        unequip(item, index);
+    }
+
+    @Override
+    public void notifySwapItemsInInventory(int indexFrom, Item itemFrom, int indexTo, Item itemTo) {
+        character.getInventory().setItem(indexTo, itemFrom);
+        character.getInventory().setItem(indexFrom, itemTo);
+    }
+
+    @Override
+    public void notifyDraggedItemOutsideInventory(int indexFrom) {
+        character.getInventory().removeItem(indexFrom);
+    }
+
+    public void setCharacter(Character character){
+        this.character = character;
+    }
 }

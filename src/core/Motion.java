@@ -10,6 +10,7 @@ public class Motion {
     private double speed;
     private double sprintSpeed;
     private boolean isAttacking;
+    private boolean isCasting;
 
     // Constructor
     public Motion(double speed) {
@@ -17,21 +18,14 @@ public class Motion {
         this.sprintSpeed = 2 * speed;
         this.vector = new Vector2D(0,0);
         this.isAttacking = false;
+        this.isCasting = false;
     }
 
     public void update(MovementController controller){
         int deltaX = 0;
         int deltaY = 0;
 
-        /*if (controller.isRequestingAttack()) {
-            isAttacking = true;
-            deltaX = 0;
-            deltaY = 0;
-        } else {
-            isAttacking = false;
-        }*/
-
-        if(isAttacking == false) {
+        if(isCasting == false) {
             if (controller.isRequestingUp()) {
                 deltaY--;
             }
@@ -57,24 +51,37 @@ public class Motion {
 
     }
 
-    // to position
-    public Vector2D getVector() {
-        return vector;
-    }
-
+    /** Setters **/
     public void setSpeed(double speed) {
         this.speed = speed;
+    }
+
+    public void setAttacking(boolean attacking) {
+        isAttacking = attacking;
+    }
+
+    public void setCasting(boolean casting) {
+        isCasting = casting;
+    }
+
+    /** Getters **/
+    public Vector2D getVector() {
+        return vector;
     }
 
     public double getSpeed() {
         return speed;
     }
 
-    // for animation
     public boolean isMoving() {
         return vector.length() > 0;
     }
+
     public boolean isAttacking(){
         return isAttacking;
+    }
+
+    public boolean isCasting() {
+        return isCasting;
     }
 }

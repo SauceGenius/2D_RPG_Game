@@ -1,6 +1,7 @@
 package ui;
 
 import audio.AudioPlayer;
+import core.CollisionBox;
 import core.Position;
 import character.Character;
 import quest.QuestLog;
@@ -39,9 +40,11 @@ public class QuestLogUI extends UI{
         if (!opened) {
             opened = true;
             //audioPlayer.playSound("OpenInventory.wav");
+            throw new UnsupportedOperationException("Open QuestLogUI Sound");
         } else {
             opened = false;
             //audioPlayer.playSound("CloseInventory.wav");
+            throw new UnsupportedOperationException("Close QuestLogUI Sound");
         }
     }
 }

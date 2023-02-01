@@ -2,75 +2,80 @@ package game;
 
 import audio.AudioPlayer;
 import core.Log;
-import display.CursorManager;
-import display.MainFrame;
-import id.ZoneId;
-import login.AccountController;
-import login.LogInPanel;
-import ui.*;
-import gameobject.Player;
+import core.Size;
+import mainFrame.cursormanager.CursorManager;
+import mainFrame.MainFrame;
+import game.state.GameState;
+import game.state.MainMenuState;
+import game.state.State;
+import game.state.StateObserver;
+import mainFrame.cursormanager.CursorManagerGameState;
 import character.Character;
 import id.GameClassId;
 import id.RaceId;
-import game.state.StateManager;
 import gfx.SpriteLibrary;
 import input.Input;
 import settings.Settings;
 import ui.button.CButton;
-import world.World;
 
 import java.util.ArrayList;
 
-public class Game implements PlayerObserver {
+public class Game implements StateObserver {
 
-    private World world;
-    private MainFrame display;
-    private StateManager stateManager;
-    private UIController uiController;
+    private Input input;
+    private SpriteLibrary spriteLibrary;
+    private AudioPlayer audioPlayer;
+    private MainFrame MainFrame;
+    private State currentState;
+
 
     public Game() {
-        this.world = new World();
-
-        Input input = new Input();
-        SpriteLibrary spriteLibrary = new SpriteLibrary();
-        AudioPlayer audioPlayer = new AudioPlayer();
-
-        LogInPanel logInPanel = new LogInPanel();
-        AccountController accountController = new AccountController();
+        this.input = new Input();
+        this.spriteLibrary = new SpriteLibrary();
+        this.audioPlayer = new AudioPlayer();
 
         Character character = new Character(1234, "SauceGenius", RaceId.human, GameClassId.Paladin, input, audioPlayer, spriteLibrary);
-        Player player = (Player) character.getGameObject();
+
         Log log = character.getLog();
 
-        uiController = new UIController(character, spriteLibrary, audioPlayer);
-        input.addInputObserver(uiController);
-        ArrayList<CButton> uiButtons = uiController.getButtons();
-        for(CButton button: uiButtons){
-            input.addInputObserver(button);
-        }
+        MainFrame = new MainFrame(Settings.WINDOW_WIDTH, Settings.WINDOW_HEIGHT, input, log);
 
-        display = new MainFrame(Settings.WINDOW_WIDTH, Settings.WINDOW_HEIGHT, accountController, input, player, log, uiController);
-        CursorManager cursorManager = new CursorManager(display);
-        stateManager = new StateManager(input, character, audioPlayer, spriteLibrary, log, cursorManager, uiController);
+        //openMainMenu();
+
+        changeToGameState(character);
     }
 
     public void update(){
-        world.update();
-        stateManager.update();
-        uiController.update();
+        currentState.update();
+        MainFrame.update(currentState);
     }
 
     public void render(){
-        display.render(stateManager.getCurrentState());
+        MainFrame.render(currentState);
+    }
+
+    private void openMainMenu(){
+        currentState = new MainMenuState(input, audioPlayer, spriteLibrary, new CursorManager(MainFrame));
+    }
+
+    public void changeToGameState(Character character){
+        //Character character = new Character(1234, "SauceGenius", RaceId.human, GameClassId.Paladin, input, audioPlayer, spriteLibrary);
+        currentState = new GameState(input, audioPlayer, spriteLibrary, character.getLog(), new CursorManagerGameState(MainFrame), new Size(Settings.WINDOW_WIDTH, Settings.WINDOW_HEIGHT));
+        ((GameState)currentState).getCamera().focusOn(character.getGameObject());
+        ((GameState)currentState).playerEntersGame(character);
+
+        input.addInputObserver(((GameState) currentState).getUiController());
+        currentState.addObserver(this);
+
+
+        ArrayList<CButton> uiButtons = ((GameState) currentState).getUiController().getButtons();
+        for(CButton button: uiButtons){
+            input.addInputObserver(button);
+        }
     }
 
     @Override
-    public void notifyCharacterEnteringWorld(Character character) {
-        world.characterEnteringWorld(character, ZoneId.ElwynnForest);
-    }
-
-    @Override
-    public void notifyCharacterLeavingWorld(Character character) {
-        world.characterLeavingWorld(character, ZoneId.ElwynnForest);
+    public void notifyCharacterEntersGame(Character character) {
+        changeToGameState(character);
     }
 }

@@ -26,6 +26,14 @@ public class Inventory {
         }
     }
 
+    public void exchangeItem(int index, Item newItem){
+        items[index] = newItem;
+    }
+
+    public void removeItem(int index){
+        items[index] = null;
+    }
+
     public Item[] getItems() {
         return items;
     }

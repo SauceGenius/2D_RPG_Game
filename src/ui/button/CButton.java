@@ -3,6 +3,7 @@ package ui.button;
 import core.CollisionBox;
 import core.Position;
 import input.InputObserver;
+import ui.Border;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -19,6 +20,7 @@ public class CButton implements InputObserver {
     protected Dimension dimension;
     protected ArrayList<ButtonObserver> buttonObservers;
     protected boolean selected = false;
+    protected Border border;
 
     public CButton(){
         text = "cButton";
@@ -28,18 +30,28 @@ public class CButton implements InputObserver {
         position = new Position(0,0);
         dimension = new Dimension(80,40);
         buttonObservers = new ArrayList<>();
+        this.border = new Border();
     }
 
     public void render(Graphics graphics){
+
+
+
         graphics.setFont(textFont);
-        if(selected){
-            graphics.setColor(Color.BLACK);
-            graphics.drawRect(position.intX(), position.intY(), dimension.width, dimension.height);
-        }
         graphics.setColor(backgroundColor);
         graphics.fillRect(position.intX(), position.intY(), dimension.width, dimension.height);
         graphics.setColor(textColor);
         graphics.drawString(text, position.intX() + 20, position.intY() + 20);
+
+        border.render(graphics, position, dimension);
+
+        if(selected){
+            graphics.setColor(new Color(255,255,255,30));
+            graphics.fillRoundRect(position.intX(), position.intY(), dimension.width, dimension.height, 8, 8);
+        } else {
+            //graphics.setColor(new Color(255,255,255,20));
+            //graphics.drawRoundRect(position.intX(), position.intY(), dimension.width, dimension.height, 8, 8);
+        }
     }
 
     public void addObserver(ButtonObserver buttonObserver){

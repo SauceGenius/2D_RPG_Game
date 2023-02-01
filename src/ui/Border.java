@@ -24,5 +24,4 @@ public class Border {
             graphics.drawRoundRect(bodyPosition.intX() + 0, bodyPosition.intY() + 0, bodyDimension.width - 0, bodyDimension.height - 0, arcW, arcH);
         }
     }
-
 }

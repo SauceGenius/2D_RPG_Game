@@ -48,4 +48,8 @@ public class AIManager {
     public void setCurrentAIState(AIState currentAIState) {
         this.currentAIState = currentAIState;
     }
+
+    public AIState getCurrentAIState() {
+        return currentAIState;
+    }
 }

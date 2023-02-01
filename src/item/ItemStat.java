@@ -56,6 +56,9 @@ public class ItemStat {
     public void setArmor(int armor) {
         this.armor = armor;
     }
+    public void setAttackSpeed(double attackSpeed){
+        this.attackSpeed = attackSpeed;
+    }
 
     //Getters
     public double getMinMeleeWeaponDamage() {return minMeleeWeaponDamage;}

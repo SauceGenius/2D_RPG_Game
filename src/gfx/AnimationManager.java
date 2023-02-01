@@ -2,6 +2,9 @@ package gfx;
 
 import controller.MovementController;
 import core.Direction;
+import gameobject.MovingEntity;
+import gameobject.NPC;
+import gameobject.Player;
 import stats.Stats;
 import stats.Status;
 import core.Time;
@@ -12,6 +15,7 @@ import java.awt.image.BufferedImage;
 
 public class AnimationManager {
 
+    private MovingEntity movingEntity;
     private MovementController controller;
     private SpriteSet spriteSet;
     private Stats stats;
@@ -26,7 +30,8 @@ public class AnimationManager {
     private boolean isPlayingAutoAttackAnimation;
     private boolean isDying;
 
-    public AnimationManager(Stats stats, Status status, MovementController controller, SpriteSet spriteSet){
+    public AnimationManager(MovingEntity movingEntity, Stats stats, Status status, MovementController controller, SpriteSet spriteSet){
+        this.movingEntity = movingEntity;
         this.isDying = false;
         this.stats = stats;
         this.status = status;
@@ -39,7 +44,6 @@ public class AnimationManager {
         this.deathTime = new Time();
         this.autoAttackAnimationTimer = new Time();
         this.isPlayingAutoAttackAnimation = false;
-
     }
 
     public Image getSprite(){
@@ -55,7 +59,7 @@ public class AnimationManager {
     }
 
     public void update(Direction direction){
-        //Auto attack timer
+        /** Auto Attack Timer **/
         if(autoAttackAnimationTimer.getUpdatesFromSeconds(3) == autoAttackAnimationTimer.getUpdatesSinceStart()){
             isPlayingAutoAttackAnimation = false;
         }
@@ -78,10 +82,16 @@ public class AnimationManager {
         } else if (isPlayingAutoAttackAnimation) {
             autoAttackAnimationTimer.startUpdateClock();
 
-            if (autoAttackAnimationTimer.getUpdatesSinceStart() <= 40) {
+            int attackUpdatesNeeded = 0;
+            if(movingEntity instanceof Player) {
+                attackUpdatesNeeded = 40;
+            } else if (movingEntity instanceof NPC){
+                attackUpdatesNeeded = 60;
+            }
+            if (autoAttackAnimationTimer.getUpdatesSinceStart() <= attackUpdatesNeeded) {
                 currentFrameTime++;
                 directionIndex = direction.getAnimationRow();
-                playAnimation("playerAttack1");
+                playAnimation("Attack1");
 
                 if (currentFrameTime >= updatesPerFrame) {
                     currentFrameTime = 0;
@@ -114,7 +124,7 @@ public class AnimationManager {
         if(!isPlayingAutoAttackAnimation) {
             if (name == "Idle") updatesPerFrame = 30;
             if (name == "Run") updatesPerFrame = 5;
-            //if(name == "playerAttack1") updatesPerFrame = 7;
+            if(name == "Attack1") updatesPerFrame = 7;
             if (name == "Dying") updatesPerFrame = 8;
             if (name == "Hurt") updatesPerFrame = 4;
         }
@@ -128,7 +138,7 @@ public class AnimationManager {
             frameIndex = 0;
             updatesPerFrame = 7;
             autoAttackAnimationTimer.restartClock();
-            playAnimation("playerAttack1");
+            playAnimation("Attack1");
             isPlayingAutoAttackAnimation = true;
         }
     }

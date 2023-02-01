@@ -1,6 +1,7 @@
 package ui.unitframes;
 
 import audio.AudioPlayer;
+import core.CollisionBox;
 import gameobject.MovingEntity;
 import gameobject.Player;
 
@@ -81,6 +82,6 @@ public class TargetUnitFrame extends UnitFrame {
 
     @Override
     public void toggle(AudioPlayer audioPlayer) {
-
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

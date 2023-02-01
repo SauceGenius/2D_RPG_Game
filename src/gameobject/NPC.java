@@ -6,6 +6,7 @@ import audio.AudioPlayer;
 import controller.MovementController;
 import controller.NPCController;
 import core.Log;
+import core.Timer;
 import item.Item;
 import item.ItemId;
 import item.OneHandWeapon;
@@ -18,28 +19,31 @@ import id.GameObjectID;
 
 public class NPC extends MovingEntity {
 
-    // Variables
+    /** Variables **/
     private AIManager aiManager;
     private Item loot;
     private Time timer;
     private NPCController npcController;
 
-    // Constructor
+
+    /** Constructor **/
     public NPC(MovementController controller, AudioPlayer audioPlayer, SpriteLibrary spriteLibrary, Log log) {
         super(controller, audioPlayer, spriteLibrary, log);
+        this.name = "Goblin Berserker";
         this.npcController = (NPCController) controller;
+        npcController.setNpc(this);
         this.gameObjectID = GameObjectID.NPC;
         this.stats = new Stats(gameObjectID, 1);
         this.stats.getLevel().setExp(30);
-        animationManager = new AnimationManager(stats, status, controller, spriteLibrary.getUnit("goblin"));
-        aiManager = new AIManager();
+        this.animationManager = new AnimationManager(this, stats, status, controller, spriteLibrary.getUnit("goblin_berserker"));
+        this.aiManager = new AIManager();
         this.loot = new OneHandWeapon(ItemId.wornShortSword, spriteLibrary.getIcon("inv_sword_34"));
-        this.name = "Goblin";
-        timer = new Time();
+        this.timer = new Time();
         this.motion.setSpeed(2);
+        status.setAggressive(true);
     }
 
-    // Methods
+    /** Methods **/
     @Override
     public void update(State state) {
         timer.startUpdateClock();
@@ -51,6 +55,7 @@ public class NPC extends MovingEntity {
         }
         status.setHasTargetInReach(false);
         status.setInReachOfPlayerInteractionBox(false);
+        status.update();
         super.update(state);
         manageDirection();
         decideAnimation();
@@ -59,16 +64,22 @@ public class NPC extends MovingEntity {
     }
 
     @Override
+    public void isHit(GameObject attackerObject, int damage) {
+
+    }
+
+    @Override
     protected void decideAnimation() {
         if (isDead()) {animationManager.playAnimation("Dying");}
         else if (isHurt()) {animationManager.playAnimation("Hurt");}
-        else if (motion.isAttacking()) {animationManager.playAnimation("Attack1");}
+        else if (status.isAutoAttacking()) {animationManager.playAutoAttackAnimation();}
         else if (motion.isMoving()) {animationManager.playAnimation("Run");}
         else {animationManager.playAnimation("Idle");}
     }
 
     @Override
     public boolean attackCollidesWith(GameObject other) {return false;}
+
     @Override
     protected void handleCollisions(GameObject other) {
         if(other instanceof Player){
@@ -85,7 +96,7 @@ public class NPC extends MovingEntity {
             Player player = (Player) other;
             status.setInReachOfPlayerInteractionBox(true);
 
-            //Attacking
+            /** Attacking **/
             if(!this.isDead()) {
                 if (this == player.getTarget()) {
                     player.getStatus().setHasTargetInReach(true);
@@ -123,7 +134,7 @@ public class NPC extends MovingEntity {
                                     other.gainExp(this);
                                 }
                             } else {
-                                // Miss
+                                /** Miss **/
                                 audioPlayer.playSound("MissWhoosh2Handed.wav");
                                 log.addToDamageLog(other.name, this.name, Integer.toString(this.position.intX() - 20), Integer.toString(this.position.intY()),"Miss","Miss", "Miss");
                             }
@@ -142,7 +153,11 @@ public class NPC extends MovingEntity {
     protected void handleDetectionCollisions(GameObject otherGameObject) {
         if(!isDead()){
             if(otherGameObject instanceof Player){
-                this.aggroes((Player)otherGameObject);
+
+                /** NPC SEES PLAYER **/
+                if(status.isAggressive()){
+                    this.aggroes((Player)otherGameObject);
+                }
             }
         }
     }
@@ -164,26 +179,51 @@ public class NPC extends MovingEntity {
         audioPlayer.playSound("MaleOgreDeath.wav");
     }
 
-    //Setters
-    public void setLoot(Item loot) {this.loot = loot;}
+    /** Setters **/
+    public void setLoot(Item loot) {
+        this.loot = loot;
+    }
 
-    //Getters
+    /** Getters **/
     @Override
-    public boolean isInReach() {return status.isInReachOfPlayerInteractionBox();}
-    @Override
-    public boolean isHurt(){return status.isHurt();}
-    @Override
-    public boolean isDead(){return status.isDead();}
-    public Item getLoot() {return loot;}
-    @Override
-    public boolean hasBeenLooted(){return status.hasBeenLooted();}
-    public AIManager getAiManager() {return aiManager;}
+    public boolean isInReach() {
+        return status.isInReachOfPlayerInteractionBox();
+    }
 
-    //Always false
     @Override
-    public boolean mouseCollidesWith(GameObject other) {return false;}
+    public boolean isHurt(){
+        return status.isHurt();
+    }
+
     @Override
-    public boolean detectionCollidesWith(GameObject other) {return false;}
+    public boolean isDead(){
+        return status.isDead();
+    }
+
+    @Override
+    public boolean hasBeenLooted(){
+        return status.hasBeenLooted();
+    }
+
+    public Item getLoot() {
+        return loot;
+    }
+
+    public AIManager getAiManager() {
+        return aiManager;
+    }
+
+    /*** Always false **/
+    @Override
+    public boolean mouseCollidesWith(GameObject other) {
+        return false;
+    }
+
+    @Override
+    public boolean detectionCollidesWith(GameObject other) {
+        return false;
+    }
+
     @Override
     public void gainExp(GameObject gameObject) {}
 }

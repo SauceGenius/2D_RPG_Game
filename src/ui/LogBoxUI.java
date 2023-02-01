@@ -1,6 +1,7 @@
 package ui;
 
 import audio.AudioPlayer;
+import core.CollisionBox;
 import core.Log;
 import core.Position;
 import settings.Settings;
@@ -28,7 +29,7 @@ public class LogBoxUI extends UI implements ButtonObserver {
     public LogBoxUI(Log log){
         opened = true;
         this.log = log;
-        position = new Position(20, Settings.WINDOW_HEIGHT - dimension.height - 35);
+        position = new Position(20, Settings.WINDOW_HEIGHT - dimension.height - 136);
 
         initButton();
     }
@@ -36,43 +37,6 @@ public class LogBoxUI extends UI implements ButtonObserver {
     @Override
     public void update() {
 
-    }
-
-    private void initButton(){
-        //General Button
-        int x = position.intX() + 10;
-        int y = position.intY();
-        int w = 80;
-        int h = 30;
-
-        CButton buttonGeneral = new CButton();
-        buttonGeneral.setText("General");
-        buttonGeneral.setTextColor(TEXT_COLOR_TITLE);
-        buttonGeneral.setTextFont(LOG_BUTTON_FONT);
-        buttonGeneral.setBackgroundColor(BACKGROUND_COLOR);
-        buttonGeneral.setPosition(x,y);
-        buttonGeneral.setDimension(w,h);
-        buttonGeneral.setSelected(true);
-        buttonGeneral.addObserver(this);
-
-        buttons.add(buttonGeneral);
-
-        //Combat Log Button
-        x = position.intX() + 100;
-        y = position.intY();
-        w = 115;
-        h = 30;
-
-        CButton buttonCombatLog = new CButton();
-        buttonCombatLog.setText("Combat Log");
-        buttonCombatLog.setTextColor(TEXT_COLOR_TITLE);
-        buttonCombatLog.setTextFont(LOG_BUTTON_FONT);
-        buttonCombatLog.setBackgroundColor(BACKGROUND_COLOR);
-        buttonCombatLog.setPosition(x,y);
-        buttonCombatLog.setDimension(w,h);
-        buttonCombatLog.addObserver(this);
-
-        buttons.add(buttonCombatLog);
     }
 
 
@@ -86,11 +50,12 @@ public class LogBoxUI extends UI implements ButtonObserver {
         int logH = dimension.height;
         int logW = dimension.width;
 
-        /// Grey background ///
+        /** Grey background **/
         graphics.setColor(BACKGROUND_COLOR);
-        graphics.fillRect(logX,logY + 32, logW, logH - 30);
+        graphics.fillRect(logX,logY + 31, logW, logH - 30);
+        new Border().render(graphics, new Position(logX, logY + 31), new Dimension(logW, logH - 30));
 
-        /// General ///
+        /** General **/
         graphics.setFont(LOG_FONT);
         if(logBoxGeneralIsOpen){
             for (int i = 0; i < 7; i++){
@@ -109,7 +74,7 @@ public class LogBoxUI extends UI implements ButtonObserver {
             }
         }
 
-        /// Combat log box - My actions ///
+        /** Combat log box - My actions **/
         if(logBoxCombatMyActionsIsOpen) {
             for(int i = 0; i < 7; i++) {
                 if(log.getDamageLog()[i][0] != null) {
@@ -133,6 +98,43 @@ public class LogBoxUI extends UI implements ButtonObserver {
         }
     }
 
+    private void initButton(){
+        //General Button
+        int x = position.intX() + 10;
+        int y = position.intY();
+        int w = 80;
+        int h = 30;
+
+        CButton buttonGeneral = new CButton();
+        buttonGeneral.setText("General");
+        buttonGeneral.setTextColor(TEXT_COLOR_TITLE);
+        buttonGeneral.setTextFont(LOG_BUTTON_FONT);
+        buttonGeneral.setBackgroundColor(BACKGROUND_COLOR);
+        buttonGeneral.setPosition(x,y);
+        buttonGeneral.setDimension(w,h);
+        buttonGeneral.setSelected(true);
+        buttonGeneral.addObserver(this);
+
+        buttons.add(buttonGeneral);
+
+        //Combat Log Button
+        x = position.intX() + 98;
+        y = position.intY();
+        w = 115;
+        h = 30;
+
+        CButton buttonCombatLog = new CButton();
+        buttonCombatLog.setText("Combat Log");
+        buttonCombatLog.setTextColor(TEXT_COLOR_TITLE);
+        buttonCombatLog.setTextFont(LOG_BUTTON_FONT);
+        buttonCombatLog.setBackgroundColor(BACKGROUND_COLOR);
+        buttonCombatLog.setPosition(x,y);
+        buttonCombatLog.setDimension(w,h);
+        buttonCombatLog.addObserver(this);
+
+        buttons.add(buttonCombatLog);
+    }
+
     private void openGeneral(){
         if(!logBoxGeneralIsOpen){
             logBoxGeneralIsOpen = true;
@@ -153,6 +155,7 @@ public class LogBoxUI extends UI implements ButtonObserver {
 
     @Override
     public void toggle(AudioPlayer audioPlayer) {}
+
 
     @Override
     public void notifyButtonClicked(CButton buttonClicked) {

@@ -58,6 +58,7 @@ public abstract class GameObject {
     public Status getStatus() {return status;}
 
     //Abstract
+    public abstract void isHit(GameObject attackerObject, int damage);
     public abstract void update(State state);
     public abstract Image getSprite();
     public abstract void gainExp(GameObject gameObject);

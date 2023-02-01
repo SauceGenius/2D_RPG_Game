@@ -1,7 +1,7 @@
 package input;
 
 import core.Position;
-import display.Camera;
+import mainFrame.Camera;
 
 import java.awt.event.*;
 import java.util.ArrayList;
@@ -11,10 +11,13 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
     //Variables
     private ArrayList<InputObserver> inputObservers;
     private Camera camera;
-    private Position mousePosition;
-    private boolean mouseClicked;
+    private Position mousePositionRelativeToCamera;
+    private Position mousePositionRelativeToScreen;
+    private boolean mouseLeftPressed;
+    private boolean mouseRightPressed;
+    private boolean mouseLeftClicked;
     private boolean mouseRightClicked;
-    private boolean mousePressed;
+    private boolean mouseReleased;
     private boolean[] pressed;
     private boolean addingItem = false;
     private boolean looting = false;
@@ -22,30 +25,44 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
     //Constructor
     public Input(){
         pressed = new boolean[255];
-        mousePosition = new Position(0,0);
+        mousePositionRelativeToCamera = new Position(0,0);
+        mousePositionRelativeToScreen = new Position(0,0);
         inputObservers = new ArrayList<>();
     }
 
-    //////////////// MOUSE ////////////////
-    @Override
-    public void mouseClicked(MouseEvent e) {
-        notifyMouseClicked(e);
-        mousePosition = new Position(e.getPoint().getX() + camera.getPosition().getX(), e.getPoint().getY() + camera.getPosition().getY());}
-
     @Override
     public void mousePressed(MouseEvent e) {
+        switch (e.getButton()) {
+            case 1 -> mouseLeftPressed = true;
+            case 3 -> mouseRightPressed = true;
+        }
+
         notifyMousePressed(e);
-        mousePressed = true;
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        mouseClicked = true;
-        mousePressed = false;
-        if(e.getButton() == 3){
-            mouseRightClicked = true;
+        mouseReleased = true;
+
+        if(mouseLeftPressed){
+            mouseLeftClicked = true;
+            mouseLeftPressed = false;
         }
+        else if(mouseRightPressed){
+            mouseRightClicked = true;
+            mouseRightPressed = false;
+        }
+
         notifyMouseReleased(e);
+    }
+
+    /** MOUSE **/
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        if(camera != null) mousePositionRelativeToCamera = new Position(e.getPoint().getX() + camera.getPosition().getX(), e.getPoint().getY() + camera.getPosition().getY());
+        mousePositionRelativeToScreen = new Position(e.getPoint().getX(), e.getPoint().getY());
+
+        notifyMouseClicked(e);
     }
 
     @Override
@@ -57,27 +74,42 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
     @Override
     public void mouseDragged(MouseEvent e) {
         notifyMouseDragged(e);
-        mousePosition = new Position(e.getPoint().getX() + camera.getPosition().getX(), e.getPoint().getY() + camera.getPosition().getY());
+        if(camera != null) mousePositionRelativeToCamera = new Position(e.getPoint().getX() + camera.getPosition().getX(), e.getPoint().getY() + camera.getPosition().getY());
+        mousePositionRelativeToScreen = new Position(e.getPoint().getX(), e.getPoint().getY());
     }
 
     @Override
     public void mouseMoved(MouseEvent e) {
         notifyMouseMoved(e);
-        mousePosition = new Position(e.getPoint().getX() + camera.getPosition().getX(), e.getPoint().getY() + camera.getPosition().getY());
+        if(camera != null) mousePositionRelativeToCamera = new Position(e.getPoint().getX() + camera.getPosition().getX(), e.getPoint().getY() + camera.getPosition().getY());
+        mousePositionRelativeToScreen = new Position(e.getPoint().getX(), e.getPoint().getY());
     }
 
-    public void clearMouseClicked() {mouseClicked = false; mouseRightClicked = false;}
 
-    public Position getMousePosition() {return mousePosition;}
+    public Position getMousePositionRelativeToCamera() {
+        return mousePositionRelativeToCamera;
+    }
 
-    public boolean isMouseClicked() {return mouseClicked;}
+    public boolean isMouseLeftPressed() {
+        return mouseLeftPressed;
+    }
 
-    public boolean isMouseRightClicked() {return mouseRightClicked;}
+    public boolean isMouseLeftClicked() {
+        return mouseLeftClicked;
+    }
 
-    public boolean isMousePressed() {return mousePressed;}
+    public boolean isMouseRightClicked() {
+        return mouseRightClicked;
+    }
+
+    public void clearMouse() {
+        mouseLeftClicked = false;
+        mouseRightClicked = false;
+        mouseReleased = false;
+    }
 
 
-    ///////////////// KEYBOARD ////////////////
+    /** KEYBOARD **/
     //Variables
 
     //Methods
@@ -138,6 +170,10 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
         for(InputObserver inputObserver: inputObservers){
             inputObserver.notifyMouseDragged(mouseEvent);
         }
+    }
+
+    public Position getMousePositionRelativeToScreen(){
+        return mousePositionRelativeToScreen;
     }
 
 

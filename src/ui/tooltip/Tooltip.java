@@ -21,7 +21,9 @@ public class Tooltip {
     }
 
     public void render(Graphics graphics, Position objectFocusedPosition){
-        position = new Position(objectFocusedPosition.intX() - tooltipBody.getDimension().width - 20, objectFocusedPosition.intY() - tooltipBody.getDimension().height/2);
+        if(objectFocusedPosition.getX() > 540){
+            position = new Position(objectFocusedPosition.intX() - tooltipBody.getDimension().width - 20, objectFocusedPosition.intY() - tooltipBody.getDimension().height/2);
+        } else position = new Position(objectFocusedPosition.intX() + 60, objectFocusedPosition.intY() - tooltipBody.getDimension().height/2);
 
         tooltipBody.render(graphics, position);
         border.render(graphics, position, tooltipBody.getDimension());

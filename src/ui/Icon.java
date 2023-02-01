@@ -24,11 +24,15 @@ public class Icon {
         iconBorder.render(graphics, iconPosition, new Dimension(ICON_WIDTH, ICON_HEIGHT));
     }
 
+    public void setDragged(boolean bool){
+        this.dragged = bool;
+    }
+
     public boolean isDragged(){
         return dragged;
     }
 
-    public void setDragged(boolean bool){
-        this.dragged = bool;
+    public Image getIconImage() {
+        return iconImage;
     }
 }

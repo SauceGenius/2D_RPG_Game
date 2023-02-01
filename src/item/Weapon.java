@@ -15,6 +15,14 @@ public abstract class Weapon extends EquipableItem{
         super(itemId, image);
     }
 
+    public void setDPS(double dps){
+        this.dps = dps;
+    }
+
+    public void setSpeed(double speed){
+        this.speed = speed;
+    }
+
     //Getters
     public double getSpeed() {return speed;}
     public double getDps() {return dps;}

@@ -9,6 +9,12 @@ import id.RaceId;
 
 public class Stats {
 
+    public static final int STAMINA = 0;
+    public static final int STRENGTH = 1;
+    public static final int INTELLECT = 2;
+    public static final int AGILITY = 3;
+    public static final int SPIRIT = 4;
+
     private GameClassId gameClassId;
     private Level level;
     private Hp hp;
@@ -85,7 +91,6 @@ public class Stats {
         level.update(this, equipment, audioPlayer, log);
 
         totalStamina = baseStamina + equipment.getTotalStaminaBonus();
-        hp.update(level.getLevelValue(), totalStamina);
 
         updatePrimaryStats(equipment);
         updateSecondaryStats(equipment);
@@ -106,7 +111,10 @@ public class Stats {
         armor = equipment.getTotalArmorBonus();
         minMeleeWeaponDamage = equipment.getTotalMinMeleeWeaponDamage();
         maxMeleeWeaponDamage = equipment.getTotalMaxMeleeWeaponDamage();
-        attackSpeed = equipment.getItem(0).getItemStat().getAttackSpeed();
+
+        if( equipment.getItem(0) != null){
+            attackSpeed = equipment.getItem(0).getItemStat().getAttackSpeed();
+        }
         critChance = 0.2;
         hitChance = 0.96;
     }
@@ -122,59 +130,6 @@ public class Stats {
         if(gameClassId == GameClassId.Warlock){meleeAttackPower = totalStrength * 2 - 20;}
         if(gameClassId == GameClassId.Warrior){meleeAttackPower = (level.getLevelValue() * 3) + (totalStrength * 2 - 20);}
     }
-
-    private void updateRangedAttackPower(){
-        if(gameClassId == GameClassId.Hunter){rangedAttackPower = (level.getLevelValue() * 2) + (totalAgility * 2 - 20);}
-        if(gameClassId == GameClassId.Rogue){rangedAttackPower = level.getLevelValue() + (totalAgility - 10);}
-        if(gameClassId == GameClassId.Warrior){rangedAttackPower = level.getLevelValue() + (totalAgility - 10);}
-    }
-
-    //Setters
-    public void setMaxHpValue(double newHp){hp.setMaxHp(newHp);}
-    public void setCurrentHpValue(double newHp){hp.setCurrentHp(newHp);}
-    public void setBaseStamina(int baseStamina) {this.baseStamina = baseStamina;}
-    public void setBaseStrength(int baseStrength) {this.baseStrength = baseStrength;}
-    public void setBaseIntellect(int baseIntellect) {this.baseIntellect = baseIntellect;}
-    public void setBaseAgility(int baseAgility) {this.baseAgility = baseAgility;}
-    public void setBaseDefense(int baseDefense) {this.baseDefense = baseDefense;}
-
-    //Getters
-    public Level getLevel() {return level;}
-    public int getLevelValue(){return level.getLevelValue();}
-    public Hp getHp() {return hp;}
-    public double getMaxHpValue(){return getHp().getMaxHp();}
-    public double getCurrentHpValue(){return getHp().getCurrentHp();}
-    public int getBaseStat(String statName) {
-        if(statName == "stamina"){return baseStamina;}
-        if(statName == "strength"){return baseStrength;}
-        if(statName == "intellect"){return baseIntellect;}
-        if(statName == "agility"){return baseAgility;}
-        if(statName == "spirit"){return baseSpirit;}
-        else return 0;
-    }
-
-    public int getStat(String statName) {
-        if(statName == "stamina"){return totalStamina;}
-        if(statName == "strength"){return totalStrength;}
-        if(statName == "intellect"){return totalIntellect;}
-        if(statName == "agility"){return totalAgility;}
-        if(statName == "spirit"){return totalSpirit;}
-        else return 0;
-    }
-
-    public int getBaseDefense() {return baseDefense;}
-    public double getMinMeleeWeaponDamage() {return minMeleeWeaponDamage;}
-    public double getMaxMeleeWeaponDamage() {return maxMeleeWeaponDamage;}
-    public int getTotalStamina() {return totalStamina;}
-    public int getTotalStrength() {return totalStrength;}
-    public int getTotalIntellect() {return totalIntellect;}
-    public int getTotalAgility() {return totalAgility;}
-    public int getDefense() {return defense;}
-    public int getArmor() {return armor;}
-    public double getAttackSpeed() {return attackSpeed;}
-    public double getMeleeAttackPower() {return meleeAttackPower;}
-    public double getCritChance() {return critChance;}
-    public double getHitChance() {return  hitChance;}
 
     //Gain stat method
     public void gain(String statName, int statGained, Log log) {
@@ -193,10 +148,100 @@ public class Stats {
         if(statName == "agility"){
             baseAgility += statGained;
             log.addToGeneral("LevelUp", "Your Agility increases by " + statGained + ".");
-            }
+        }
         if(statName == "spirit"){
             baseSpirit += statGained;
             log.addToGeneral("LevelUp", "Your Spirit increases by " + statGained + ".");
         }
+    }
+
+    private void updateRangedAttackPower(){
+        if(gameClassId == GameClassId.Hunter){rangedAttackPower = (level.getLevelValue() * 2) + (totalAgility * 2 - 20);}
+        if(gameClassId == GameClassId.Rogue){rangedAttackPower = level.getLevelValue() + (totalAgility - 10);}
+        if(gameClassId == GameClassId.Warrior){rangedAttackPower = level.getLevelValue() + (totalAgility - 10);}
+    }
+
+    /** Setters **/
+    public void setMaxHpValue(double newHp){hp.setMaxHp(newHp);}
+    public void setCurrentHpValue(double newHp){hp.setCurrentHp(newHp);}
+
+
+    /** Getters **/
+    public int getBaseStat(int statIndex) {
+        switch (statIndex){
+            case STAMINA -> {return baseStamina;}
+            case STRENGTH -> {return baseStrength;}
+            case INTELLECT -> {return baseIntellect;}
+            case AGILITY -> {return baseAgility;}
+            case SPIRIT -> {return baseSpirit;}
+        }
+        return 0;
+    }
+
+    public int getStat(int statIndex) {
+        switch (statIndex){
+            case STAMINA -> {return totalStamina;}
+            case STRENGTH -> {return totalStrength;}
+            case INTELLECT -> {return totalIntellect;}
+            case AGILITY -> {return totalAgility;}
+            case SPIRIT -> {return totalSpirit;}
+        }
+        return 0;
+    }
+
+    public Level getLevel() {
+        return level;
+    }
+
+    public int getLevelValue(){
+        return level.getLevelValue();
+    }
+
+    public Hp getHp() {
+        return hp;
+    }
+
+    public double getMaxHpValue(){
+        return getHp().getMaxHp();
+    }
+
+    public double getCurrentHpValue(){
+        return getHp().getCurrentHp();
+    }
+
+    public int getBaseDefense() {
+        return baseDefense;
+    }
+
+    public double getMinMeleeWeaponDamage() {
+        return minMeleeWeaponDamage;
+    }
+
+    public double getMaxMeleeWeaponDamage() {
+        return maxMeleeWeaponDamage;
+    }
+
+    public int getDefense() {
+        return defense;
+    }
+
+    public int getArmor() {
+        return armor;
+    }
+
+    public double getAttackSpeed() {
+        return attackSpeed;
+    }
+
+    public double getMeleeAttackPower() {
+        return meleeAttackPower;
+    }
+
+    public double getCritChance() {
+        return critChance;
+    }
+
+    public double getHitChance() {
+        return  hitChance;
     }
 }

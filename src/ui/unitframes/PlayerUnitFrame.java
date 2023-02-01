@@ -1,6 +1,7 @@
 package ui.unitframes;
 
 import audio.AudioPlayer;
+import core.CollisionBox;
 import gameobject.Player;
 
 import java.awt.*;
@@ -31,7 +32,12 @@ public class PlayerUnitFrame extends UnitFrame {
         graphics.setColor(Color.yellow);
         graphics.drawString(player.getName(), x + 100, y + 14);
         graphics.setColor(Color.green);
-        graphics.fillRect(x + 60,y + 20,(int)(player.getStats().getCurrentHpValue()/player.getStats().getMaxHpValue() * w), h);
+
+        if(player.getStats().getCurrentHpValue() <= player.getStats().getMaxHpValue()){
+            graphics.fillRect(x + 60,y + 20,(int)(player.getStats().getCurrentHpValue()/player.getStats().getMaxHpValue() * w), h);
+        } else {
+            graphics.fillRect(x + 60,y + 20, w, h);
+        }
         graphics.setColor(Color.black);
         graphics.drawRect(x + 60,y,w,40);
         graphics.drawRect(x + 60,y + 20,w,10);
@@ -59,5 +65,12 @@ public class PlayerUnitFrame extends UnitFrame {
     }
 
     @Override
-    public void toggle(AudioPlayer audioPlayer) {}
+    public void toggle(AudioPlayer audioPlayer) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public CollisionBox getCollisionBox() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }

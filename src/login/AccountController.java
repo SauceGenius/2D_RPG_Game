@@ -1,12 +1,10 @@
 package login;
 
 import character.Character;
-import game.PlayerObserver;
 import input.InputObserver;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
 
 public class AccountController implements InputObserver {
 

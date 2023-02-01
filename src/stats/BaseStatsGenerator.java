@@ -90,7 +90,7 @@ public class BaseStatsGenerator {
 
         // Orc //
         if(raceId == RaceId.orc && gameClassId == GameClassId.Warrior){
-            System.out.println("Creating base stats for orc warrior");
+            //System.out.println("Creating base stats for orc warrior");
             baseStats[0] = 24;
             baseStats[1] = 26;
             baseStats[2] = 17;
@@ -100,7 +100,7 @@ public class BaseStatsGenerator {
 
         // Human //
         if(raceId == RaceId.human && gameClassId == GameClassId.Mage){
-            System.out.println("Creating base stats for human mage");
+            //System.out.println("Creating base stats for human mage");
             baseStats[0] = 20;
             baseStats[1] = 20;
             baseStats[2] = 20;
@@ -109,7 +109,7 @@ public class BaseStatsGenerator {
         }
 
         if(raceId == RaceId.human && gameClassId == GameClassId.Paladin){
-            System.out.println("Creating base stats for human paladin");
+            //System.out.println("Creating base stats for human paladin");
             baseStats[0] = 22;
             baseStats[1] = 22;
             baseStats[2] = 20;
@@ -118,7 +118,7 @@ public class BaseStatsGenerator {
         }
 
         if(raceId == RaceId.human && gameClassId == GameClassId.Priest){
-            System.out.println("Creating base stats for human priest");
+            //System.out.println("Creating base stats for human priest");
             baseStats[0] = 20;
             baseStats[1] = 20;
             baseStats[2] = 20;
@@ -127,7 +127,7 @@ public class BaseStatsGenerator {
         }
 
         if(raceId == RaceId.human && gameClassId == GameClassId.Rogue){
-            System.out.println("Creating base stats for human rogue");
+            //System.out.println("Creating base stats for human rogue");
             baseStats[0] = 21;
             baseStats[1] = 21;
             baseStats[2] = 23;
@@ -136,7 +136,7 @@ public class BaseStatsGenerator {
         }
 
         if(raceId == RaceId.human && gameClassId == GameClassId.Warlock){
-            System.out.println("Creating base stats for human warlock");
+            //System.out.println("Creating base stats for human warlock");
             baseStats[0] = 21;
             baseStats[1] = 20;
             baseStats[2] = 20;
@@ -145,7 +145,7 @@ public class BaseStatsGenerator {
         }
 
         if(raceId == RaceId.human && gameClassId == GameClassId.Warrior){
-            System.out.println("Creating base stats for human warrior");
+            //System.out.println("Creating base stats for human warrior");
             baseStats[0] = 22;
             baseStats[1] = 23;
             baseStats[2] = 20;
