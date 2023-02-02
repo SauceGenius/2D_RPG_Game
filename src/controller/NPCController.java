@@ -1,13 +1,9 @@
 package controller;
 
 import core.Position;
-import gameobject.GameObject;
-import gameobject.NPC;
-import gameobject.Player;
 
 public class NPCController implements MovementController {
 
-    private NPC npc;
     private boolean up;
     private boolean down;
     private boolean left;
@@ -34,16 +30,6 @@ public class NPCController implements MovementController {
         left = false;
     }
 
-    public void attack(GameObject target) {
-        npc.getMotion().setAttacking(true);
-
-        /** calculate damamge **/
-        int damage = 5;
-
-        /** Hit target **/
-        target.isHit(npc, damage);
-    }
-
     @Override
     public boolean isRequestingUp() {
         return up;
@@ -68,8 +54,4 @@ public class NPCController implements MovementController {
         return false;
     }
 
-    /** Setters **/
-    public void setNpc(NPC npc) {
-        this.npc = npc;
-    }
 }

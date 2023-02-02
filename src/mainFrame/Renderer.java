@@ -4,6 +4,8 @@ import character.Character;
 import core.Log;
 import game.state.GameState;
 import game.state.MainMenuState;
+import gameobject.LivingObject;
+import gameobject.NPC;
 import login.AccountController;
 import ui.UIController;
 import gameobject.GameObject;
@@ -108,46 +110,33 @@ public class Renderer {
     }
 
     private void renderNamePlates(State state, Graphics graphics) {
-        String level = "Lvl. ";
-
-        //Finding the target
-        GameObject target;
-        target = (GameObject) player.getTarget();
-
-        if(player.getTarget() != null){
-            target = (GameObject) player.getTarget();
-        }
 
         for (int i = 0; i < state.getGameObjects().size(); i++) {
             GameObject tempObject = state.getGameObjects().get(i);
+            Font namePlateFont = new Font("FrizQuadrataStd", Font.BOLD, 20);
+            graphics.setFont(namePlateFont);
 
-            //Color of the nameplate
-            /*if (tempObject.getGameObjectID() == GameObjectID.player) {
-                graphics.setColor(Color.blue);
-                graphics.setFont(new Font("FrizQuadrataStd", Font.BOLD, 20));
-                graphics.drawString(
-                        tempObject.getName(),
-                        (int) (tempObject.getPosition().getX() - state.getCamera().getPosition().getX() - 30),
-                        (int) (tempObject.getPosition().getY() - state.getCamera().getPosition().getY() - 40));
-            }
+            if (tempObject instanceof NPC) {
+                FontMetrics metrics = graphics.getFontMetrics(namePlateFont);
+                int nameTextWidth = metrics.stringWidth(tempObject.getName());
 
-            else*/ if (tempObject.getGameObjectID() == GameObjectID.NPC) {
-                int x = (int) (tempObject.getPosition().getX() - camera.getPosition().getX() - 10);
+                int x = (int) (tempObject.getPosition().getX() - camera.getPosition().getX() - nameTextWidth/2 + 24);
                 int y = (int) (tempObject.getPosition().getY() - camera.getPosition().getY() - 45);
 
-                graphics.setFont(new Font("FrizQuadrataStd-Bold", Font.PLAIN, 22));
+                //graphics.setFont(new Font("FrizQuadrataStd-Bold", Font.PLAIN, 22));
 
-                //shadow
+                /** Shadow **/
                 graphics.setColor(new Color(0,0,0,175));
                 graphics.drawString(tempObject.getName(), x + 2, y - 2);
 
-                if(tempObject.isDead()) {
+                /** Color of the nameplate **/
+                if(((LivingObject)tempObject).isDead()) {
                     graphics.setColor(Color.gray);
-                } else if(player.getStatus().isInCombat() && tempObject == player.getTarget()){
+                } else if(((LivingObject)tempObject).getStatus().isAggressiveTowardTarget()){
                     graphics.setColor(Color.red);
                 } else graphics.setColor(Color.yellow);
 
-                //NPC Name
+                /** NPC Name String **/
                 graphics.drawString(tempObject.getName(), x, y);
             }
         }
@@ -157,10 +146,10 @@ public class Renderer {
         for (int i = 0; i < state.getGameObjects().size(); i++) {
             GameObject tempObject = state.getGameObjects().get(i);
             GameObject target;
-            target = (GameObject) player.getTarget();
+            target = player.getTarget();
 
-            if (tempObject.getGameObjectID() == GameObjectID.NPC && tempObject == target) {
-                if(!tempObject.isDead()) {
+            if (tempObject instanceof NPC && tempObject == target) {
+                if(!((LivingObject)tempObject).isDead()) {
 
                     int x = (int) (tempObject.getPosition().getX() - camera.getPosition().getX() - 40);
                     int y = (int) (tempObject.getPosition().getY() - camera.getPosition().getY() - 38);
@@ -172,8 +161,12 @@ public class Renderer {
                     //Health bar
                     graphics.setColor(new Color(60,63,68, 150));
                     graphics.fillRoundRect(x, y, w, h, arcW,arcH);
-                    graphics.setColor(Color.yellow);
-                    graphics.fillRoundRect(x, y, (int) (tempObject.getCurrentHpValue() / tempObject.getMaxHpValue() * w), h, arcW, arcH);
+                    if (((LivingObject)tempObject).getStatus().isAggressiveTowardTarget()){
+                        graphics.setColor(Color.red);
+                    } else {
+                        graphics.setColor(Color.yellow);
+                    }
+                    graphics.fillRoundRect(x, y, (int) (((LivingObject)tempObject).getStats().getCurrentHpValue() / ((LivingObject)tempObject).getStats().getMaxHpValue() * w), h, arcW, arcH);
                     graphics.setColor(Color.black);
                     graphics.drawRoundRect(x, y, w, h,arcW,arcH);
 
@@ -191,11 +184,11 @@ public class Renderer {
                     //Level text
                     graphics.setColor(Color.black);
                     graphics.setFont(new Font("TimesRoman", Font.BOLD, 14));
-                    graphics.drawString(Integer.toString(tempObject.getLevel()), x + 1 + w + 9, y + 12);
+                    graphics.drawString(Integer.toString(((LivingObject)tempObject).getLevel()), x + 1 + w + 9, y + 12);
 
                     graphics.setColor(Color.yellow);
                     graphics.setFont(new Font("TimesRoman", Font.BOLD, 14));
-                    graphics.drawString(Integer.toString(tempObject.getLevel()), x + 1 + w + 9 - 1, y + 11);
+                    graphics.drawString(Integer.toString(((LivingObject)tempObject).getLevel()), x + 1 + w + 9 - 1, y + 11);
                 }
             }
         }
@@ -255,7 +248,7 @@ public class Renderer {
             GameObject tempObject = currentState.getGameObjects().get(i);
 
             //Color of the nameplate
-            if (tempObject.getGameObjectID() == GameObjectID.NPC) {
+            if (tempObject instanceof NPC) {
                 graphics.setColor(Color.red);
                 graphics.drawRect(
                         tempObject.getHitBox().getBounds().x - camera.getPosition().intX(),
@@ -271,7 +264,7 @@ public class Renderer {
             GameObject tempObject = currentState.getGameObjects().get(i);
 
             //Color of the nameplate
-            if (tempObject.getGameObjectID() == GameObjectID.NPC) {
+            if (tempObject instanceof NPC) {
                 graphics.setColor(Color.orange);
                 graphics.drawRect(
                         tempObject.getDetectionBox().getBounds().x - camera.getPosition().intX(),
@@ -319,8 +312,8 @@ public class Renderer {
 
     private void renderMousePointer(Graphics graphics) {
         graphics.setColor(Color.gray);
-        graphics.drawRect(player.getPlayerController().getMousePosition().intX() - 10 - camera.getPosition().intX(),
-                player.getPlayerController().getMousePosition().intY() - 10 - camera.getPosition().intY(),
-                20, 20);
+        graphics.drawRect(player.getPlayerController().getMousePosition().intX() - 2 - camera.getPosition().intX(),
+                player.getPlayerController().getMousePosition().intY() - 2 - camera.getPosition().intY(),
+                4, 4);
     }
 }

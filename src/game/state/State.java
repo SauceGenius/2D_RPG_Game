@@ -1,14 +1,10 @@
 package game.state;
 
 import audio.AudioPlayer;
-import core.Log;
 import core.Position;
-import mainFrame.Camera;
 import mainFrame.cursormanager.CursorManager;
 import login.Account;
-import ui.UIController;
 import gameobject.GameObject;
-import character.Character;
 import core.Time;
 import gfx.SpriteLibrary;
 import input.Input;
@@ -24,14 +20,16 @@ public abstract class State {
     //protected UIController uiManager;
     protected AudioPlayer audioPlayer;
     protected GameMap gameMap;
-    protected List<GameObject> gameObjects;
+
+    protected ArrayList<GameObject> gameObjects;
+    protected ArrayList<GameObject> pendingGameObjects;
+    protected ArrayList<GameObject> toRemoveGameObjects;
 
     //protected ArrayList<Character> characters;
     protected Account account;
 
     protected SpriteLibrary spriteLibrary;
     protected Input input;
-    protected Camera camera;
     protected Time time;
     protected List<Time> respawnTimer;
     protected CursorManager cursorManager;
@@ -42,6 +40,8 @@ public abstract class State {
         this.input = input;
         this.spriteLibrary = spriteLibrary;
         this.gameObjects = new ArrayList<>();
+        this.pendingGameObjects = new ArrayList<>();
+        this.toRemoveGameObjects = new ArrayList<>();
         //this.characters = new ArrayList<>();
         this.time = new Time();
         this.respawnTimer = new ArrayList<>();
@@ -51,8 +51,33 @@ public abstract class State {
 
     public void update(){
         sortObjectsByPosition();
+
+        for(int i = 0; i < toRemoveGameObjects.size(); i++){
+            for (int y = 0; y < gameObjects.size(); y++){
+                if(gameObjects.get(y) == toRemoveGameObjects.get(i)){
+                    gameObjects.remove(y);
+                    System.out.println("Removed GameObject");
+                    y--;
+                }
+            }
+        }
+
+        for(int i = 0; i < pendingGameObjects.size(); i++){
+            gameObjects.add(pendingGameObjects.get(i));
+            pendingGameObjects.remove(i);
+            i--;
+        }
+
         gameObjects.forEach(gameObject -> gameObject.update(this));
         //characters.forEach(character -> character.update(this));
+    }
+
+    public void addGameObject(GameObject gameObject){
+        pendingGameObjects.add(gameObject);
+    }
+
+    public void removeGameObject(GameObject gameObject){
+        toRemoveGameObjects.add(gameObject);
     }
 
     protected abstract void handleMouseInput();
@@ -61,11 +86,12 @@ public abstract class State {
         gameObjects.sort(Comparator.comparing(gameObjects -> gameObjects.getPosition().getY()));
     }
 
+    /** Collision **/
     public List<GameObject> getCollidingObjects(GameObject gameObject){
         return gameObjects.stream().filter(other -> other.collidesWith(gameObject)).collect(Collectors.toList());
     }
-    public List<GameObject> getAttackedObjects(GameObject gameObject) {
-        return gameObjects.stream().filter(other -> other.attackCollidesWith(gameObject)).collect(Collectors.toList());
+    public List<GameObject> getInMeleeRangeObjects(GameObject gameObject) {
+        return gameObjects.stream().filter(other -> other.meleeRangeCollidesWith(gameObject)).collect(Collectors.toList());
     }
     public List<GameObject> getClickedObjects(GameObject gameObject) {
         return gameObjects.stream().filter(other -> other.mouseCollidesWith(gameObject)).collect(Collectors.toList());
@@ -82,7 +108,7 @@ public abstract class State {
         observers.remove(observer);
     }
 
-    //Getters
+    /** Getters **/
     public List<GameObject> getGameObjects() {
         return gameObjects;
     }

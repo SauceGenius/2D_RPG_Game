@@ -60,7 +60,7 @@ public class Game implements StateObserver {
 
     public void changeToGameState(Character character){
         //Character character = new Character(1234, "SauceGenius", RaceId.human, GameClassId.Paladin, input, audioPlayer, spriteLibrary);
-        currentState = new GameState(input, audioPlayer, spriteLibrary, character.getLog(), new CursorManagerGameState(MainFrame), new Size(Settings.WINDOW_WIDTH, Settings.WINDOW_HEIGHT));
+        currentState = new GameState(input, audioPlayer, spriteLibrary, character.getLog(), new CursorManagerGameState(MainFrame, character), new Size(Settings.WINDOW_WIDTH, Settings.WINDOW_HEIGHT));
         ((GameState)currentState).getCamera().focusOn(character.getGameObject());
         ((GameState)currentState).playerEntersGame(character);
 

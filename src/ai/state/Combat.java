@@ -7,12 +7,15 @@ import gameobject.NPC;
 import gameobject.Player;
 import game.state.State;
 
-public class Aggressive extends AIState{
+import java.awt.*;
+import java.awt.geom.RoundRectangle2D;
+
+public class Combat extends AIState{
 
     private Player target;
     private Timer autoAttackTimer;
 
-    public Aggressive(Player player){
+    public Combat(Player player){
         target = player;
         this.autoAttackTimer = new Timer(0.1);
     }
@@ -28,7 +31,12 @@ public class Aggressive extends AIState{
         currentNPC.getMotion().setSpeed(2);
 
         NPCController controller = (NPCController) currentNPC.getController();
-        if(!currentNPC.getStatus().isAutoAttacking()){
+
+        if(currentNPC.getStatus().isRanged()){
+            if(!currentNPC.isAutoAttacking()){
+                controller.moveToTarget(target.getPosition(), currentNPC.getPosition());
+            }
+        } else if (!currentNPC.getStatus().isRanged()){
             controller.moveToTarget(target.getPosition(), currentNPC.getPosition());
         }
 
@@ -38,8 +46,12 @@ public class Aggressive extends AIState{
         combatUpdate(controller, currentNPC);
     }
 
-    private boolean arrived(NPC currentCharacter){
-        return currentCharacter.getPosition().isInMeleeRangeOf(target.getPosition());
+    private boolean arrived(NPC currentNPC){
+        if(currentNPC.getStatus().isRanged()){
+            return currentNPC.getPosition().isInRangedRangeOf(target.getPosition());
+        } else {
+            return currentNPC.getPosition().isInMeleeRangeOf(target.getPosition());
+        }
     }
 
     private void combatUpdate(NPCController controller, NPC currentNPC) {
@@ -53,11 +65,12 @@ public class Aggressive extends AIState{
                     currentNPC.getStatus().setHasTargetInReach(true);
                     if (autoAttackTimer.timeIsUp()) {
                         currentNPC.getStatus().setIsAutoAttacking(true);
-                        controller.attack(target);
+                        currentNPC.autoAttacks(target);
                         autoAttackTimer.startClockSeconds(3);
                     }
                 } else {
                     currentNPC.getStatus().setHasTargetInReach(false);
+                    currentNPC.getStatus().setIsAutoAttacking(false);
                 }
             }
         }

@@ -1,10 +1,15 @@
 package game.state;
 
+import audio.AudioLibrary;
 import audio.AudioPlayer;
 import character.Character;
 import controller.NPCController;
 import core.Log;
 import core.Size;
+import gameobject.LivingObject;
+import gameobject.NPCGenerator;
+import gameobject.mob.GoblinBerserker;
+import gameobject.mob.GoblinSlinger;
 import mainFrame.Camera;
 import mainFrame.cursormanager.CursorManager;
 import mainFrame.cursormanager.CursorManagerGameState;
@@ -25,16 +30,18 @@ public class GameState extends State {
     private Camera camera;
     private UIController uiController;
     private ArrayList<Character> characters;
+    private NPCGenerator npcGenerator;
 
     public GameState(Input input, AudioPlayer audioPlayer, SpriteLibrary spriteLibrary, Log log, CursorManager cursorManager, Size windowSize) {
         super(input, audioPlayer, spriteLibrary, cursorManager);
         this.log = log;
         this.camera = new Camera(windowSize);
         this.characters = new ArrayList<>();
+        this.npcGenerator = new NPCGenerator(spriteLibrary, audioPlayer, log);
         input.setCamera(camera);
         gameMap = new GameMap(new Size(200,200),spriteLibrary);
         initializeCharacters();
-        audioPlayer.playMusic("ElwynnForest.wav");
+        audioPlayer.playMusic(AudioLibrary.ELWYNN_FOREST_THEME);
     }
 
     @Override
@@ -60,6 +67,7 @@ public class GameState extends State {
 
     @Override
     protected void handleMouseInput() {
+        //System.out.println("Mouse: " + input.getMousePositionRelativeToCamera().intX() + "," + input.getMousePositionRelativeToCamera().intY());
 
         /** always last **/
         input.clearMouse();
@@ -67,9 +75,11 @@ public class GameState extends State {
 
     public void statusUpdate(){
         for(int i = 0; i < gameObjects.size(); i++){
-            if(gameObjects.get(i).hasBeenLooted()){
-                gameObjects.remove(i);
-                respawnTimer.add(new Time());
+            if(gameObjects.get(i) instanceof LivingObject){
+                if(((LivingObject)gameObjects.get(i)).hasBeenLooted()){
+                    gameObjects.remove(i);
+                    respawnTimer.add(new Time());
+                }
             }
         }
     }
@@ -78,9 +88,17 @@ public class GameState extends State {
         for(int i = 0; i < respawnTimer.size(); i++){
             respawnTimer.get(i).startUpdateClock();
             if(respawnTimer.get(i).getUpdatesSinceStart() == time.getUpdatesFromSeconds(5)) {
-                NPC npc = new NPC(new NPCController(), audioPlayer, spriteLibrary, log);
-                npc.setPosition(getGameMap().getRandomPosition());
-                gameObjects.add(npc);
+                double dice = Math.random() * 2;
+                if (dice > 1){
+                    NPC goblinBerserker = npcGenerator.generateNPC(NPCGenerator.GOBLIN_BERSERKER, 2);
+                    goblinBerserker.setPosition(getGameMap().getRandomPosition());
+                    gameObjects.add(goblinBerserker);
+                }
+                else{
+                    NPC goblinSlinger = npcGenerator.generateNPC(NPCGenerator.GOBLIN_SLINGER,1);
+                    goblinSlinger.setPosition(getGameMap().getRandomPosition());
+                    gameObjects.add(goblinSlinger); 
+                }
             }
         }
     }
@@ -93,14 +111,19 @@ public class GameState extends State {
             camera.focusOn(character.getGameObject());
         }**/
 
-        initializeNPCs(20);
+        initializeNPCs(10);
     }
 
     private void initializeNPCs(int numberOfNPCs) {
         for(int i = 0; i < numberOfNPCs; i++){
-            NPC npc = new NPC(new NPCController(), audioPlayer, spriteLibrary, log);
-            npc.setPosition(getGameMap().getRandomPosition());
-            gameObjects.add(npc);
+
+            NPC goblinBerserker = npcGenerator.generateNPC(NPCGenerator.GOBLIN_BERSERKER, 2);
+            goblinBerserker.setPosition(getGameMap().getRandomPosition());
+            gameObjects.add(goblinBerserker);
+
+            NPC goblinSlinger = npcGenerator.generateNPC(NPCGenerator.GOBLIN_SLINGER, 1);
+            goblinSlinger.setPosition(getGameMap().getRandomPosition());
+            gameObjects.add(goblinSlinger);
         }
     }
 

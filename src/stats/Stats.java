@@ -3,6 +3,7 @@ package stats;
 import audio.AudioPlayer;
 import core.Log;
 import equipment.Equipment;
+import gameobject.LivingObject;
 import id.GameObjectID;
 import id.GameClassId;
 import id.RaceId;
@@ -74,10 +75,10 @@ public class Stats {
     }
 
     //Constructor for NPCs
-    public Stats(GameObjectID gameObjectID, int level){
+    public Stats(LivingObject livingObject, int level){
         this.level = new Level(level);
-        totalStamina = 4;
-        this.hp = new Hp(gameObjectID, totalStamina);
+        totalStamina = 4 + 1 * (level - 1);
+        this.hp = new Hp(livingObject, totalStamina);
         minMeleeWeaponDamage = 0;
         baseStrength = 0;
         baseIntellect = 0;

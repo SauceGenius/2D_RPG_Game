@@ -1,5 +1,6 @@
 package ui.equipmentui;
 
+import audio.AudioLibrary;
 import audio.AudioPlayer;
 import core.CollisionBox;
 import core.Position;
@@ -138,7 +139,7 @@ public class CharacterPanelUI extends UI {
     public void toggle(AudioPlayer audioPlayer) {
         if (!opened) {
             opened = true;
-            audioPlayer.playSound("CharacterSheetOpen.wav");
+            audioPlayer.playSound(AudioLibrary.CHARACTER_SHEET_OPENED_SOUND_EFFECT);
         } else {
             opened = false;
             draggingItemOver = false;

@@ -49,4 +49,8 @@ public class Position {
     public boolean isInMeleeRangeOf(Position position) {
         return Math.abs(x - position.getX()) < Position.PROXIMITY_RANGE * 15 && Math.abs(y - position.getY()) < Position.PROXIMITY_RANGE * 15;
     }
+
+    public boolean isInRangedRangeOf(Position position){
+        return Math.abs(x - position.getX()) < Position.PROXIMITY_RANGE * 60 && Math.abs(y - position.getY()) < Position.PROXIMITY_RANGE * 60;
+    }
 }

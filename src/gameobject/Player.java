@@ -1,5 +1,7 @@
 package gameobject;
 
+import ai.state.Stand;
+import audio.AudioLibrary;
 import inventory.Inventory;
 import audio.AudioPlayer;
 import controller.MovementController;
@@ -7,40 +9,38 @@ import controller.PlayerController;
 import core.CollisionBox;
 import core.Log;
 import equipment.Equipment;
+import item.Item;
 import stats.Stats;
 import core.Timer;
 import game.state.State;
 import gfx.AnimationManager;
 import gfx.SpriteLibrary;
-import id.GameObjectID;
 
 import java.awt.*;
 import java.util.List;
 
 public class Player extends MovingEntity {
 
-    //Variables
-    private MovingEntity target;
-    private Equipment equipment;
+    /** Variables **/
     private PlayerController playerController;
+    private Equipment equipment;
     private Timer autoAttackTimer;
-    private AudioPlayer audioPlayer;
+    private LivingObject target;
 
-    //TO REMOVE
+    /** TO REMOVE **/
     private Inventory inventory;
 
     /** Constructor **/
     public Player(String userName, MovementController controller, AudioPlayer audioPlayer, Stats stats, Inventory inventory, Equipment equipment, SpriteLibrary spriteLibrary, Log log){
-        super(controller, audioPlayer, spriteLibrary, log);
+        super(audioPlayer, log);
+        this.controller = controller;
         this.playerController = (PlayerController) controller;
-        this.gameObjectID = GameObjectID.player;
         this.stats = stats;
         this.inventory = inventory;
         this.name = userName;
         this.animationManager = new AnimationManager(this, stats, status, controller, spriteLibrary.getUnit("player"));
         this.equipment = equipment;
         this.autoAttackTimer = new Timer(0.1);
-        this.audioPlayer = audioPlayer;
     }
 
     /** Methods **/
@@ -52,18 +52,233 @@ public class Player extends MovingEntity {
         decideAnimation();
         animationManager.update(direction);
         stats.update(equipment, audioPlayer, log);
-        status.setHasTargetInReach(false);
         updateTarget();
-        status.update();
+        status.update(this);
     }
 
     @Override
     protected void decideAnimation() {
         if (isDead()) {animationManager.playAnimation("Dying");}
         else if (isAutoAttacking()) {animationManager.playAutoAttackAnimation();}
+        else if (isHurt()) {animationManager.playAnimation("Hurt");}
         else if (motion.isMoving()) {animationManager.playAnimation("Run");}
-        else if (status.isHurt()) {animationManager.playAnimation("Hurt");}
         else {animationManager.playAnimation("Idle");}
+    }
+
+    /** Target and Aggro **/
+    private void targets(LivingObject target){
+        setTarget(target);
+        audioPlayer.playSound(AudioLibrary.SELECT_TARGET);
+        if(playerController.isRightClicking()){
+            status.setAggressiveTowardTarget(true);
+        }
+    }
+
+    public void aggroed(LivingObject aggroedGameObject){
+        if(!isInCombat()){
+           enteringCombat();
+        }
+        if(target == null){
+            targets(aggroedGameObject);
+        }
+        status.addAttacker(aggroedGameObject);
+    }
+
+    private void updateTarget(){
+        if(target != null && target.hasBeenLooted()) {
+            setTarget(null);
+        }
+    }
+
+    /** Attacks **/
+    private void combatUpdate() {
+        autoAttackTimer.update();
+        if(status.getAttackers().size() == 0 && status.isInCombat()){
+            /** Will have to find a better way to leave combat **/
+            leavingCombat();
+        }
+        if (status.isAggressiveTowardTarget()) {
+            if (status.hasTargetInReach() && !target.isDead()) {
+                if (autoAttackTimer.timeIsUp()) {
+                    /** Activate Auto Attack **/
+                    autoAttackTimer.startClockSeconds(stats.getAttackSpeed());
+                    setIsAutoAttacking(true);
+                    autoAttacks(target);
+                }
+            }
+        }
+    }
+
+    public void autoAttacks(LivingObject target){
+        if(!isInCombat()) enteringCombat();
+        if(attackHits()) {
+            int damage;
+            if(attackCrits()) {
+                damage = (int)attackDamage(true);
+                audioPlayer.playMeleeAttackSound(true);
+                log.addToDamageLog(name, target.name, Integer.toString(target.position.intX()), Integer.toString(target.position.intY()),"Critical",Integer.toString(damage), "Physical");
+            } else {
+                damage = (int)attackDamage(false);
+                audioPlayer.playMeleeAttackSound(false);
+                log.addToDamageLog(name, target.name, Integer.toString(target.position.intX()), Integer.toString(target.position.intY()),"Hit",Integer.toString(damage), "Physical");
+            }
+
+            ((LivingObject)target).isHit((LivingObject) this, damage);
+        } else {
+            /** Miss **/
+            audioPlayer.playSound(AudioLibrary.MISS_2H);
+            log.addToDamageLog(name,target.name, Integer.toString(target.position.intX() - 20), Integer.toString(target.position.intY()),"Miss","Miss", "Miss");
+        }
+        status.addTaggedObject(target);
+    }
+
+    public boolean attackHits(){
+        double hitDice = Math.random();
+        if(hitDice <= stats.getHitChance()){
+            return true;
+        } else return false;
+    }
+
+    public boolean attackCrits(){
+        double critDice = Math.random();
+        if(critDice <= stats.getCritChance()) return true;
+        else return false;
+    }
+
+    public double attackDamage(boolean isCrit){
+        double AP = (double)stats.getStat(Stats.STRENGTH) * 2 + (double)stats.getLevelValue() * 3 - 20;
+        double dpsFromAP = AP / 14;
+        double damageFromAP = dpsFromAP * stats.getAttackSpeed();
+        double minDamage = stats.getMinMeleeWeaponDamage() + damageFromAP;
+        double maxDamage = stats.getMaxMeleeWeaponDamage() + damageFromAP;
+        double damage =  minDamage + Math.random() * (maxDamage - minDamage);
+        if (isCrit == true){
+            return damage * 1.5;
+        } else return damage;
+    }
+
+    @Override
+    public void isHit(LivingObject attackerObject, int damage) {
+        if(!isInCombat()){
+            enteringCombat();
+        }
+        if(target == null){
+            target = attackerObject;
+        }
+        status.setAggressiveTowardTarget(true);
+        status.setIsHurt(true);
+        playerController.loseHP(damage);
+    }
+
+    @Override
+    public void taggedGameObjectIsKilled(LivingObject killedGameObject) {
+        if(killedGameObject == target){
+            target = null;
+        }
+        gainExp(killedGameObject);
+        status.removeAttacker(killedGameObject);
+        status.removeTaggedObject(killedGameObject);
+    }
+
+    public void gainExp(LivingObject gameObject) {
+        int gainedExp = gameObject.getExp();
+        stats.getLevel().gainExp(gainedExp);
+
+        log.addToGeneral("Exp","You gained " + gainedExp + " exp.");
+    }
+
+    public void loots(NPC npc) {
+        //TO IMPLEMENT: If inventory is not full
+        for(Item item: npc.getLoot()){
+            inventory.addItem(item);
+            log.addToGeneral("Loot","You receive loot: " + item.getName() + ".");
+        }
+        npc.status.setHasBeenLooted(true);
+        audioPlayer.playSound(AudioLibrary.LOOT_SOUND_EFFECT);
+    }
+
+    @Override
+    public void dies() {
+        System.out.println("You died");
+        position.setX(50);
+        position.setY(50);
+        for (LivingObject attacker: status.getAttackers()){
+            /** Implement removing target **/
+            ((NPC)attacker).getAiManager().setCurrentAIState(new Stand());
+        }
+        status.setInCombat(false);
+        stats.getHp().setCurrentHp(stats.getMaxHpValue());
+
+    }
+
+    public void enteringCombat(){
+        System.out.println(this.name + " is entering combat.");
+        status.setInCombat(true);
+    }
+
+    public void leavingCombat(){
+        System.out.println(this.name + " is leaving combat.");
+        status.setInCombat(false);
+        stats.getHp().resetHp5Timer();
+    }
+
+    /** Setters **/
+    public void setTarget(LivingObject target) {
+        this.target = target;
+    }
+
+    public void setIsAutoAttacking(boolean isAutoAttacking) {
+        status.setIsAutoAttacking(isAutoAttacking);
+    }
+
+    /** Getters **/
+    public Stats getStats() {
+        return stats;
+    }
+
+    public Equipment getEquipment() {
+        return equipment;
+    }
+    public PlayerController getPlayerController(){
+        return this.playerController;
+    }
+
+    public LivingObject getTarget() {
+        return target;
+    }
+
+    public Timer getAutoAttackTimer() {
+        return autoAttackTimer;
+    }
+
+    /** Collision **/
+    public CollisionBox getInteractionBox() {
+        //South
+        if(direction.getAnimationRow() == 0) {return new CollisionBox(new Rectangle(position.intX() - 22, position.intY() + 40, size.getWidth() + 40, size.getHeight() + 20));}
+        //West
+        else if(direction.getAnimationRow() == 1) {return new CollisionBox(new Rectangle(position.intX() - 60, position.intY(), size.getWidth() + 20, size.getHeight() + 40));}
+        //North
+        else if(direction.getAnimationRow() == 2) {return new CollisionBox(new Rectangle(position.intX() - 22, position.intY() - 48, size.getWidth() + 40, size.getHeight() + 60));}
+        //East
+        else {return new CollisionBox(new Rectangle(position.intX() + 30, position.intY(), size.getWidth() + 20, size.getHeight() + 40));}
+    }
+
+    public boolean meleeRangeCollidesWith(GameObject other) {
+        return getInteractionBox().collidesWith(other.getHitBox()) ;
+    }
+
+    @Override
+    public boolean mouseCollidesWith(GameObject other) {
+        if(other instanceof LivingObject){
+            CollisionBox pointer = new CollisionBox(new Rectangle(playerController.getMousePosition().intX() - 10, playerController.getMousePosition().intY() - 10, 20, 20));
+            return pointer.collidesWith(other.getHitBox());
+        }
+        else return false;
+    }
+
+    @Override
+    public boolean detectionCollidesWith(GameObject other) {
+        return getDetectionBox().collidesWith(other.getHitBox());
     }
 
     @Override
@@ -88,49 +303,13 @@ public class Player extends MovingEntity {
         }
     }
 
-    public CollisionBox getInteractionBox() {
-        //South
-        if(direction.getAnimationRow() == 0) {return new CollisionBox(new Rectangle(position.intX() - 12, position.intY() + 60, size.getWidth() + 20, size.getHeight() + 20));}
-        //West
-        else if(direction.getAnimationRow() == 1) {return new CollisionBox(new Rectangle(position.intX() - 60, position.intY() + 20, size.getWidth() + 20, size.getHeight() + 20));}
-        //North
-        else if(direction.getAnimationRow() == 2) {return new CollisionBox(new Rectangle(position.intX() - 12, position.intY() - 26, size.getWidth() + 20, size.getHeight() + 20));}
-        //East
-        else {return new CollisionBox(new Rectangle(position.intX() + 36, position.intY() + 20, size.getWidth() + 20, size.getHeight() + 20));}
-    }
-
-    public boolean attackCollidesWith(GameObject other) {
-        return getInteractionBox().collidesWith(other.getHitBox()) ;
-    }
-
-    @Override
-    public boolean mouseCollidesWith(GameObject other) {
-        CollisionBox pointer = new CollisionBox(new Rectangle(playerController.getMousePosition().intX() - 10, playerController.getMousePosition().intY() - 10, 20, 20));
-        return pointer.collidesWith(other.getHitBox());
-    }
-
-    @Override
-    public boolean detectionCollidesWith(GameObject other) {
-        return getDetectionBox().collidesWith(other.getHitBox());
-    }
-
-    @Override
-    protected void handleInteractionCollisions(GameObject other) {}
-
-    @Override
-    protected void handleMouseCollisions(GameObject other) {}
-
-    @Override
-    protected void handleDetectionCollisions(GameObject otherGameObject) {}
-
     public void handleClickOnGameObject(List<GameObject> gameObjects) {
-
         /** Left-clicking on mob **/
         if(playerController.isLeftClicking()){
             for(GameObject other: gameObjects){
                 if(other instanceof NPC){
-                    if(!other.isDead()) {
-                        targets((MovingEntity) other);
+                    targets((LivingObject) other);
+                    if(!((LivingObject)other).isDead()) {
                     }
                 }
             }
@@ -140,155 +319,27 @@ public class Player extends MovingEntity {
         else if (playerController.isRightClicking()){
             for(GameObject other: gameObjects){
                 if(other instanceof NPC){
-                    if(!other.isDead()) {
-                        targets((MovingEntity) other);
-                        status.setInCombat(true);
+                    if(!((LivingObject)other).isDead()) {
+                        targets(((LivingObject)other));
+                        status.setAggressiveTowardTarget(true);
                     } else if(playerController.isRightClicking()){
-                        loots((NPC)other);
+                        if (meleeRangeCollidesWith(other)){
+                            loots((NPC)other);
+                        } else {
+                            System.out.println("Target is too far away");
+                        }
                     }
                 }
             }
         }
     }
 
-    private void targets(MovingEntity target){
-        setTarget(target);
-        audioPlayer.playSound("SelectTarget.wav");
-        if(playerController.isRightClicking()){
-            status.setInCombat(true);
-        }
-    }
-
-    private void updateTarget(){
-        if(target != null && target.hasBeenLooted()) {setTarget(null);}
-    }
-
-    public void aggroed(MovingEntity mob){
-        status.setInCombat(true);
-        if(target == null){
-            setTarget(mob);
-        }
-    }
-
-    private void combatUpdate() {
-        autoAttackTimer.update();
-        if(target == null){status.setInCombat(false);}
-        if (status.isInCombat()) {
-            if (status.hasTargetInReach()) {
-                if (autoAttackTimer.timeIsUp()) {
-                    //Activate auto attack
-                    autoAttackTimer.startClockSeconds(stats.getAttackSpeed());
-                    setIsAutoAttacking(true);
-                }
-            }
-        }
-    }
-
-    public boolean hits(){
-        double hitDice = Math.random();
-        if(hitDice <= stats.getHitChance()){
-            return true;
-        } else return false;
-    }
-
-    public boolean crits(){
-        double critDice = Math.random();
-        if(critDice <= stats.getCritChance()) return true;
-        else return false;
-    }
-
-    public double attackDamage(boolean isCrit){
-
-        double AP = (double)stats.getStat(Stats.STRENGTH) * 2 + (double)stats.getLevelValue() * 3 - 20;
-        double dpsFromAP = AP / 14;
-        double damageFromAP = dpsFromAP * stats.getAttackSpeed();
-        double minDamage = stats.getMinMeleeWeaponDamage() + damageFromAP;
-        double maxDamage = stats.getMaxMeleeWeaponDamage() + damageFromAP;
-        double damage =  minDamage + Math.random() * (maxDamage - minDamage);
-
-        if (isCrit == true){
-            return damage * 1.5;
-        } else return damage;
-    }
-
-    public void loots(NPC npc) {
-        //TO IMPLEMENT: If inventory is not full
-        inventory.addItem(npc.getLoot());
-        npc.status.setHasBeenLooted(true);
-        log.addToGeneral("Loot","You receive loot: " + npc.getLoot().getName() + ".");
-        audioPlayer.playSound("LootCreatureEmpty.wav");
-    }
+    @Override
+    protected void handleIsInMeleeRangeOfCollisions(GameObject other) {}
 
     @Override
-    public void gainExp(GameObject gameObject) {
-        int gainedExp = gameObject.getExp();
-        stats.getLevel().gainExp(gainedExp);
-
-        log.addToGeneral("Exp","You gained " + gainedExp + " exp.");
-    }
+    protected void handleMouseCollisions(GameObject other) {}
 
     @Override
-    protected void dies() {}
-
-    /** Setters **/
-    @Override
-    public void isHit(GameObject attackerObject, int damage) {
-        status.setIsHurt(true);
-        playerController.loseHP(damage);
-    }
-
-    public void setTarget(MovingEntity target) {
-        this.target = target;
-    }
-
-    public void setIsAutoAttacking(boolean isAutoAttacking) {
-        status.setIsAutoAttacking(isAutoAttacking);
-    }
-
-    public void setAudioPlayer(AudioPlayer audioPlayer) {
-        this.audioPlayer = audioPlayer;
-    }
-
-
-    /** Getters **/
-    @Override
-    public boolean isDead() {
-        return false;
-    }
-    @Override
-    public boolean isHurt() {
-        return false;
-    }
-    @Override
-    public boolean hasBeenLooted() {
-        return false;
-    }
-
-    @Override
-    public boolean isInReach() {
-        return false;
-    }
-
-    public Stats getStats() {
-        return stats;
-    }
-
-    public Equipment getEquipment() {
-        return equipment;
-    }
-
-    public PlayerController getPlayerController(){
-        return this.playerController;
-    }
-    public MovingEntity getTarget() {
-        return target;
-    }
-
-    public boolean isAutoAttacking() {
-        return status.isAutoAttacking();
-    }
-
-    public Timer getAutoAttackTimer() {
-        return autoAttackTimer;
-    }
+    protected void handleDetectionCollisions(GameObject otherGameObject) {}
 }

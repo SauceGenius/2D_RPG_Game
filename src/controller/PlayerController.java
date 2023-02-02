@@ -2,6 +2,7 @@ package controller;
 
 import character.Character;
 import core.Position;
+import gameobject.LivingObject;
 import input.Input;
 import input.InputObserver;
 import item.EquipableItem;
@@ -23,10 +24,11 @@ public class PlayerController implements MovementController, InputObserver, UIMa
 
     private void equip(EquipableItem item, int indexFrom){
         if(item instanceof Weapon){
-            if(!character.getGameObject().getStatus().isInCombat()){
+            if(!((LivingObject)character.getGameObject()).getStatus().isInCombat()){
                 Item equippedItem = character.getEquipment().getItem(0);
                 character.getEquipment().equip(item);
                 character.getInventory().exchangeItem(indexFrom, equippedItem);
+                character.getStats().getHp().resetHp5Timer();
             } else {
                 System.out.println("Cant equip while in combat");
             }

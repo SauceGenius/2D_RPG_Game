@@ -1,5 +1,6 @@
 package ui.inventoryui;
 
+import audio.AudioLibrary;
 import audio.AudioPlayer;
 import core.CollisionBox;
 import core.Position;
@@ -103,10 +104,10 @@ public class InventoryUI extends UI {
     public void toggle(AudioPlayer audioPlayer){
         if (!opened) {
             opened = true;
-            audioPlayer.playSound("OpenInventory.wav");
+            audioPlayer.playSound(AudioLibrary.INVENTORY_OPENED_SOUND_EFFECT);
         } else {
             opened = false;
-            audioPlayer.playSound("CloseInventory.wav");
+            audioPlayer.playSound(AudioLibrary.INVENTORY_CLOSED_SOUND_EFFECT);
             draggingItemOver = false;
             mouseOverUI = false;
             for (int i = 0; i < inventorySlots.length; i++){

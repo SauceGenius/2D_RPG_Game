@@ -10,8 +10,7 @@ public abstract class UnitFrame extends UI {
     protected BufferedImage unitImage;
     protected Player player;
 
-    public UnitFrame(BufferedImage unitImage, Player player){
-        this.unitImage = unitImage;
+    public UnitFrame(Player player){
         this.player = player;
     }
 }

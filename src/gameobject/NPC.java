@@ -1,85 +1,157 @@
 package gameobject;
 
+import ability.Ability;
+import ability.MeleeAutoAttack;
+import ability.RangedAutoAttack;
 import ai.AIManager;
-import ai.state.Aggressive;
+import ai.state.Combat;
+import audio.AudioLibrary;
 import audio.AudioPlayer;
-import controller.MovementController;
 import controller.NPCController;
 import core.Log;
 import core.Timer;
 import item.Item;
-import item.ItemId;
-import item.OneHandWeapon;
-import stats.Stats;
-import core.Time;
 import game.state.State;
-import gfx.AnimationManager;
-import gfx.SpriteLibrary;
-import id.GameObjectID;
+import item.LootTable;
 
-public class NPC extends MovingEntity {
+import java.util.ArrayList;
+
+public abstract class NPC extends MovingEntity {
 
     /** Variables **/
-    private AIManager aiManager;
-    private Item loot;
-    private Time timer;
-    private NPCController npcController;
+    protected AIManager aiManager;
+    protected LootTable lootTable;
+    protected NPCController npcController;
+    protected LivingObject target;
+    protected double animationAttackSpeed;
+    protected Timer autoAttackSpeedTimer;
+    protected Ability currentAbility;
 
 
     /** Constructor **/
-    public NPC(MovementController controller, AudioPlayer audioPlayer, SpriteLibrary spriteLibrary, Log log) {
-        super(controller, audioPlayer, spriteLibrary, log);
-        this.name = "Goblin Berserker";
-        this.npcController = (NPCController) controller;
-        npcController.setNpc(this);
-        this.gameObjectID = GameObjectID.NPC;
-        this.stats = new Stats(gameObjectID, 1);
-        this.stats.getLevel().setExp(30);
-        this.animationManager = new AnimationManager(this, stats, status, controller, spriteLibrary.getUnit("goblin_berserker"));
+    public NPC(AudioPlayer audioPlayer, Log log) {
+        super(audioPlayer, log);
+        this.autoAttackSpeedTimer = new Timer();
+        this.npcController = new NPCController();
+        this.controller = npcController;
         this.aiManager = new AIManager();
-        this.loot = new OneHandWeapon(ItemId.wornShortSword, spriteLibrary.getIcon("inv_sword_34"));
-        this.timer = new Time();
-        this.motion.setSpeed(2);
-        status.setAggressive(true);
+        this.lootTable = new LootTable();
     }
 
     /** Methods **/
     @Override
     public void update(State state) {
-        timer.startUpdateClock();
-        if(status.isHurt()) {
-            npcController.stop();
-            if (timer.getUpdatesSinceStart() >= 40) {
-                status.setIsHurt(false);
-            }
-        }
-        status.setHasTargetInReach(false);
-        status.setInReachOfPlayerInteractionBox(false);
-        status.update();
+        status.update(this);
         super.update(state);
         manageDirection();
         decideAnimation();
         animationManager.update(direction);
         aiManager.update(state, this);
-    }
 
-    @Override
-    public void isHit(GameObject attackerObject, int damage) {
-
+        if(currentAbility != null){
+            currentAbility.update(state);
+        }
     }
 
     @Override
     protected void decideAnimation() {
         if (isDead()) {animationManager.playAnimation("Dying");}
+        else if (isAutoAttacking()) {animationManager.playAutoAttackAnimation();}
         else if (isHurt()) {animationManager.playAnimation("Hurt");}
-        else if (status.isAutoAttacking()) {animationManager.playAutoAttackAnimation();}
         else if (motion.isMoving()) {animationManager.playAnimation("Run");}
         else {animationManager.playAnimation("Idle");}
     }
 
-    @Override
-    public boolean attackCollidesWith(GameObject other) {return false;}
+    public void aggroes(LivingObject aggroedGameObject){
+        if(aggroedGameObject instanceof Player){
+            target = aggroedGameObject;
+            Player player = (Player) aggroedGameObject;
+            if(!status.isInCombat()){
+                status.setInCombat(true);
+                getAiManager().setCurrentAIState(new Combat(player));
+                audioPlayer.playSound(AudioLibrary.GOBLIN_AGGRO);
+                player.aggroed(this);
+            }
+        }
+        if(aggroedGameObject instanceof NPC){
+            System.out.println("NPC aggroing another npc is not implemented yet");
+        }
+    }
 
+    @Override
+    public void autoAttacks(LivingObject target) {
+        motion.setAttacking(true);
+
+        playAutoAttackSound();
+
+        /** calculate damamge **/
+        int damage = 5;
+
+        if(status.isRanged()){
+            currentAbility = new RangedAutoAttack(this, target, damage, animationAttackSpeed);
+        } else {
+            currentAbility = new MeleeAutoAttack(this, target, damage, animationAttackSpeed);
+        }
+    }
+
+    protected abstract void playAutoAttackSound();
+
+    @Override
+    public void taggedGameObjectIsKilled(LivingObject killedGameObject) {
+
+    }
+
+    @Override
+    public void isHit(LivingObject attackerObject, int damage) {
+        status.addAttacker(attackerObject);
+        if(target == null){
+            aggroes(attackerObject);
+        }
+        if(status.isHurt() == false) {
+            status.setIsHurt(true);
+        }
+        double newHP = stats.getCurrentHpValue() - damage;
+        stats.setCurrentHpValue(newHP);
+
+        if (stats.getCurrentHpValue() <= 0) {
+            this.dies();
+            log.addToDamageLog(name, target.name, Integer.toString(target.position.intX()), Integer.toString(target.position.intY()), "Slain", "null", "null");
+        }
+    }
+
+    @Override
+    public void dies(){
+        stats.getHp().setCurrentHp(0);
+        status.setIsDead(true);
+        aiManager.setOn(false);
+        animationManager.setIsDying(true);
+        currentAbility = null;
+        audioPlayer.playSound(AudioLibrary.GOBLIN_DEATH);
+        for(LivingObject attacker: status.getAttackers()){
+            attacker.taggedGameObjectIsKilled(this);
+        }
+
+    }
+
+    /** Setters **/
+    public void setCurrentAbility(Ability currentAbility) {
+        this.currentAbility = currentAbility;
+    }
+
+    /** Getters **/
+    public ArrayList<Item> getLoot() {
+        return lootTable.generateLoot();
+    }
+
+    public LootTable getLootTable() {
+        return lootTable;
+    }
+
+    public AIManager getAiManager() {
+        return aiManager;
+    }
+
+    /** Collision **/
     @Override
     protected void handleCollisions(GameObject other) {
         if(other instanceof Player){
@@ -91,56 +163,23 @@ public class NPC extends MovingEntity {
     }
 
     @Override
-    protected void handleInteractionCollisions(GameObject other) {
-        if(other instanceof Player){
+    protected void handleIsInMeleeRangeOfCollisions(GameObject other) {
+        if(other instanceof Player) {
             Player player = (Player) other;
-            status.setInReachOfPlayerInteractionBox(true);
+            if(player.getTarget() == this){
+                player.getStatus().setHasTargetInReach(true);
+            }
+        }
+    }
 
-            /** Attacking **/
-            if(!this.isDead()) {
-                if (this == player.getTarget()) {
-                    player.getStatus().setHasTargetInReach(true);
+    @Override
+    protected void handleDetectionCollisions(GameObject otherGameObject) {
+        if(!isDead()){
+            if(otherGameObject instanceof Player){
 
-                    if (player.isAutoAttacking()){
-                        if (status.isHurt() == false) {
-                            status.setIsHurt(true);
-
-                            if(player.hits())
-                            {
-                                NPCController controller = (NPCController) getController();
-                                controller.stop();
-
-                                int damage;
-
-                                if(player.crits())
-                                {
-                                    damage = (int)player.attackDamage(true);
-                                    audioPlayer.playMeleeAttackSound(true);
-                                    log.addToDamageLog(other.name, this.name, Integer.toString(this.position.intX()), Integer.toString(this.position.intY()),"Critical",Integer.toString(damage), "Physical");
-
-                                } else {
-                                    damage = (int)player.attackDamage(false);
-                                    audioPlayer.playMeleeAttackSound(false);
-                                    log.addToDamageLog(other.name, this.name, Integer.toString(this.position.intX()), Integer.toString(this.position.intY()),"Hit",Integer.toString(damage), "Physical");
-                                }
-
-                                double newHP = stats.getCurrentHpValue() - damage;
-                                stats.setCurrentHpValue(newHP);
-
-                                if (stats.getCurrentHpValue() <= 0) {
-                                    this.dies();
-                                    log.addToDamageLog(player.getName(), this.getName(), Integer.toString(this.position.intX()), Integer.toString(this.position.intY()), "Slain", "null", "null");
-                                    player.setTarget(null);
-                                    other.gainExp(this);
-                                }
-                            } else {
-                                /** Miss **/
-                                audioPlayer.playSound("MissWhoosh2Handed.wav");
-                                log.addToDamageLog(other.name, this.name, Integer.toString(this.position.intX() - 20), Integer.toString(this.position.intY()),"Miss","Miss", "Miss");
-                            }
-                            timer = new Time();
-                        }
-                    }
+                /** NPC SEES PLAYER **/
+                if(status.isAggressiveTowardTarget()){
+                    this.aggroes((LivingObject) otherGameObject);
                 }
             }
         }
@@ -150,70 +189,10 @@ public class NPC extends MovingEntity {
     protected void handleMouseCollisions(GameObject other){}
 
     @Override
-    protected void handleDetectionCollisions(GameObject otherGameObject) {
-        if(!isDead()){
-            if(otherGameObject instanceof Player){
-
-                /** NPC SEES PLAYER **/
-                if(status.isAggressive()){
-                    this.aggroes((Player)otherGameObject);
-                }
-            }
-        }
+    public boolean meleeRangeCollidesWith(GameObject other) {
+        return false;
     }
 
-    public void aggroes(Player player){
-        if(!status.isInCombat()){
-            status.setInCombat(true);
-            getAiManager().setCurrentAIState(new Aggressive(player));
-            audioPlayer.playSound("MaleOgreAggro.wav");
-            player.aggroed(this);
-        }
-    }
-
-    @Override
-    protected void dies(){
-        status.setIsDead(true);
-        aiManager.setOn(false);
-        animationManager.setIsDying(true);
-        audioPlayer.playSound("MaleOgreDeath.wav");
-    }
-
-    /** Setters **/
-    public void setLoot(Item loot) {
-        this.loot = loot;
-    }
-
-    /** Getters **/
-    @Override
-    public boolean isInReach() {
-        return status.isInReachOfPlayerInteractionBox();
-    }
-
-    @Override
-    public boolean isHurt(){
-        return status.isHurt();
-    }
-
-    @Override
-    public boolean isDead(){
-        return status.isDead();
-    }
-
-    @Override
-    public boolean hasBeenLooted(){
-        return status.hasBeenLooted();
-    }
-
-    public Item getLoot() {
-        return loot;
-    }
-
-    public AIManager getAiManager() {
-        return aiManager;
-    }
-
-    /*** Always false **/
     @Override
     public boolean mouseCollidesWith(GameObject other) {
         return false;
@@ -223,7 +202,6 @@ public class NPC extends MovingEntity {
     public boolean detectionCollidesWith(GameObject other) {
         return false;
     }
-
-    @Override
-    public void gainExp(GameObject gameObject) {}
 }
+
+

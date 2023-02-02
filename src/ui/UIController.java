@@ -63,12 +63,13 @@ public class UIController implements InputObserver {
         addUI(new ExpBarUI(character));
         addUI(new ActionBarUI(character));
         addUI(new PlayerUnitFrame((BufferedImage) spriteLibrary.getUnit("player").get("Idle"), player));
-        addUI(new TargetUnitFrame(null, player));
+        addUI(new TargetUnitFrame(player));
         addUI(new QuestLogUI(character));
     }
 
     public void update(){
         uiList.forEach(ui -> ui.update());
+        ((TargetUnitFrame)uiList.get(TARGET_UNIT_FRAME)).update(spriteLibrary);
     }
 
     public void update(Input input){

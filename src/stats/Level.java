@@ -1,5 +1,6 @@
 package stats;
 
+import audio.AudioLibrary;
 import audio.AudioPlayer;
 import core.Log;
 import equipment.Equipment;
@@ -42,7 +43,7 @@ public class Level {
         while(exp >= expToNextLevel){
             exp = exp - expToNextLevel;
             level += 1;
-            audioPlayer.playSound("LevelUp.wav");
+            audioPlayer.playSound(AudioLibrary.LEVEL_UP_SOUND_EFFECT);
 
             log.addToGeneral("LevelUp","Congratulations, you have reached level " + level + "!");
 

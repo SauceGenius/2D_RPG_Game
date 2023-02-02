@@ -10,7 +10,8 @@ import java.awt.image.BufferedImage;
 public class PlayerUnitFrame extends UnitFrame {
 
     public PlayerUnitFrame(BufferedImage unitImage, Player player){
-        super(unitImage, player);
+        super(player);
+        this.unitImage = unitImage;
         opened = true;
     }
 
@@ -42,12 +43,12 @@ public class PlayerUnitFrame extends UnitFrame {
         graphics.drawRect(x + 60,y,w,40);
         graphics.drawRect(x + 60,y + 20,w,10);
         graphics.setColor(Color.black);
-        graphics.drawString(Integer.toString((int)player.getCurrentHpValue()).concat(" / ").concat(Integer.toString((int)player.getMaxHpValue())),60 + 79,y + 29);
-        graphics.drawString(Integer.toString((int)player.getCurrentHpValue()).concat(" / ").concat(Integer.toString((int)player.getMaxHpValue())),60 + 81,y + 29);
-        graphics.drawString(Integer.toString((int)player.getCurrentHpValue()).concat(" / ").concat(Integer.toString((int)player.getMaxHpValue())),60 + 79,y + 31);
-        graphics.drawString(Integer.toString((int)player.getCurrentHpValue()).concat(" / ").concat(Integer.toString((int)player.getMaxHpValue())),60 + 81,y + 31);
+        graphics.drawString(Integer.toString((int)player.getStats().getCurrentHpValue()).concat(" / ").concat(Integer.toString((int)player.getStats().getMaxHpValue())),60 + 79,y + 29);
+        graphics.drawString(Integer.toString((int)player.getStats().getCurrentHpValue()).concat(" / ").concat(Integer.toString((int)player.getStats().getMaxHpValue())),60 + 81,y + 29);
+        graphics.drawString(Integer.toString((int)player.getStats().getCurrentHpValue()).concat(" / ").concat(Integer.toString((int)player.getStats().getMaxHpValue())),60 + 79,y + 31);
+        graphics.drawString(Integer.toString((int)player.getStats().getCurrentHpValue()).concat(" / ").concat(Integer.toString((int)player.getStats().getMaxHpValue())),60 + 81,y + 31);
         graphics.setColor(Color.white);
-        graphics.drawString(Integer.toString((int)player.getCurrentHpValue()).concat(" / ").concat(Integer.toString((int)player.getMaxHpValue())),60 + 80,y + 30);
+        graphics.drawString(Integer.toString((int)player.getStats().getCurrentHpValue()).concat(" / ").concat(Integer.toString((int)player.getStats().getMaxHpValue())),60 + 80,y + 30);
 
         graphics.drawImage(unitImage.getSubimage(15,298,96,48).getScaledInstance(127,64,1),x - 10,y - 14,null);
 

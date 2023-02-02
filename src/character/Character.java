@@ -1,5 +1,6 @@
 package character;
 
+import gameobject.LivingObject;
 import inventory.Inventory;
 import audio.AudioPlayer;
 import controller.PlayerController;
@@ -70,7 +71,7 @@ public class Character {
 
     public void update(State state){
         //gameObject.update(state); //already updates in GameState GameObjects ArrayList
-        stats.getHp().update(stats, gameObject.getStatus());
+        stats.getHp().update(stats, ((LivingObject)gameObject).getStatus());
         inventory.update();
         log.update();
     }

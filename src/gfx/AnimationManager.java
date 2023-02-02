@@ -6,7 +6,7 @@ import gameobject.MovingEntity;
 import gameobject.NPC;
 import gameobject.Player;
 import stats.Stats;
-import stats.Status;
+import stats.StatusLiving;
 import core.Time;
 import settings.Settings;
 
@@ -19,7 +19,7 @@ public class AnimationManager {
     private MovementController controller;
     private SpriteSet spriteSet;
     private Stats stats;
-    private Status status;
+    private StatusLiving status;
     private BufferedImage currentAnimationSheet;
     private Time autoAttackAnimationTimer;
     private int updatesPerFrame;
@@ -30,7 +30,7 @@ public class AnimationManager {
     private boolean isPlayingAutoAttackAnimation;
     private boolean isDying;
 
-    public AnimationManager(MovingEntity movingEntity, Stats stats, Status status, MovementController controller, SpriteSet spriteSet){
+    public AnimationManager(MovingEntity movingEntity, Stats stats, StatusLiving status, MovementController controller, SpriteSet spriteSet){
         this.movingEntity = movingEntity;
         this.isDying = false;
         this.stats = stats;
@@ -146,6 +146,10 @@ public class AnimationManager {
     public void setIsDying(boolean isDying) {
         frameIndex = 0;
         this.isDying = isDying;
+    }
+
+    public void setSpriteSet(SpriteSet spriteSet) {
+        this.spriteSet = spriteSet;
     }
 
     /*public void attackAnimation() {
