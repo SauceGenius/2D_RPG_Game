@@ -18,8 +18,9 @@ public class GoblinBerserker extends NPC {
         this.name = "Goblin Berserker";
         this.stats = new Stats(this, level);
         this.stats.getLevel().setExp(45);
-        this.motion.setSpeed(2);
-        this.status.setAggressiveTowardTarget(true);
+        this.runningSpeed = 2.5;
+        this.motion.setSpeed(walkingSpeed);
+        this.status.setAggressiveOnDetection(true);
         this.animationAttackSpeed = 0.8;
         this.soundTimer = new Timer(0);
     }

@@ -53,5 +53,4 @@ public class NPCController implements MovementController {
     public boolean isRequestingSprint() {
         return false;
     }
-
 }

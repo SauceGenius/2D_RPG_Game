@@ -3,6 +3,7 @@ package ai.state;
 import ai.AITransition;
 import controller.NPCController;
 import core.Timer;
+import gameobject.LivingObject;
 import gameobject.NPC;
 import gameobject.Player;
 import game.state.State;
@@ -12,31 +13,45 @@ import java.awt.geom.RoundRectangle2D;
 
 public class Combat extends AIState{
 
-    private Player target;
+    private LivingObject target;
     private Timer autoAttackTimer;
 
-    public Combat(Player player){
-        target = player;
+    public Combat(){
         this.autoAttackTimer = new Timer(0.1);
     }
 
 
     @Override
     protected AITransition initializeTransition() {
-        return null;
+        return new AITransition("flee", ((state, currentCharacter) ->
+                currentCharacter.getStatus().canFlee()
+                        && currentCharacter.getStats().getHp().getCurrentHp() / currentCharacter.getStats().getHp().getMaxHp() < 0.5
+                        && !currentCharacter.isAutoAttacking()
+                        && ((Player)currentCharacter.getTarget()).getInteractionBox().collidesWith(currentCharacter.getHitBox())));
     }
 
     @Override
     public void update(State state, NPC currentNPC) {
-        currentNPC.getMotion().setSpeed(2);
+        target = currentNPC.getTarget();
+
+        currentNPC.getMotion().setSpeed(currentNPC.getRunningSpeed());
 
         NPCController controller = (NPCController) currentNPC.getController();
 
         if(currentNPC.getStatus().isRanged()){
+            if(currentNPC.isAutoAttacking()){
+
+            }
             if(!currentNPC.isAutoAttacking()){
                 controller.moveToTarget(target.getPosition(), currentNPC.getPosition());
+            } else if (!currentNPC.getDirection().isFacingTarget(target, currentNPC)){
+                /** cancels npc ranged auto attack **/
+                currentNPC.getStatus().setIsAutoAttacking(false);
+                currentNPC.getAnimationManager().stopCurrentAnimation();
             }
-        } else if (!currentNPC.getStatus().isRanged()){
+
+
+        } else {
             controller.moveToTarget(target.getPosition(), currentNPC.getPosition());
         }
 

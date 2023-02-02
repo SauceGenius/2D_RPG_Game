@@ -1,9 +1,6 @@
 package ai;
 
-import ai.state.AIState;
-import ai.state.Dead;
-import ai.state.Stand;
-import ai.state.Wander;
+import ai.state.*;
 import controller.NPCController;
 import gameobject.NPC;
 import game.state.State;
@@ -34,12 +31,11 @@ public class AIManager {
     private void transitionTo(String nextState) {
         //System.out.println("Goblin is transitioning to " + nextState);
         switch (nextState) {
-            case "wander":
-                currentAIState = new Wander();
-                return;
-            case "stand":
-            default:
-                currentAIState = new Stand();
+            case "flee" -> currentAIState = new Flee();
+            case "combat" -> currentAIState = new Combat();
+            case "wander" -> currentAIState = new Wander();
+            case "stand" -> currentAIState = new Stand();
+            default -> currentAIState = new Stand();
         }
     }
 

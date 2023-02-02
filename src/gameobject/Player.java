@@ -2,6 +2,7 @@ package gameobject;
 
 import ai.state.Stand;
 import audio.AudioLibrary;
+import core.Size;
 import inventory.Inventory;
 import audio.AudioPlayer;
 import controller.MovementController;
@@ -33,6 +34,9 @@ public class Player extends MovingEntity {
     /** Constructor **/
     public Player(String userName, MovementController controller, AudioPlayer audioPlayer, Stats stats, Inventory inventory, Equipment equipment, SpriteLibrary spriteLibrary, Log log){
         super(audioPlayer, log);
+        this.size = new Size(96,96);
+        this.runningSpeed = 3;
+        this.motion.setSpeed(runningSpeed);
         this.controller = controller;
         this.playerController = (PlayerController) controller;
         this.stats = stats;
@@ -58,8 +62,8 @@ public class Player extends MovingEntity {
 
     @Override
     protected void decideAnimation() {
-        if (isDead()) {animationManager.playAnimation("Dying");}
-        else if (isAutoAttacking()) {animationManager.playAutoAttackAnimation();}
+        //if (isDead()) {animationManager.playAnimation("Dying");}
+        /*else*/ if (isAutoAttacking()) {animationManager.playAutoAttackAnimation();}
         else if (isHurt()) {animationManager.playAnimation("Hurt");}
         else if (motion.isMoving()) {animationManager.playAnimation("Run");}
         else {animationManager.playAnimation("Idle");}
@@ -70,7 +74,7 @@ public class Player extends MovingEntity {
         setTarget(target);
         audioPlayer.playSound(AudioLibrary.SELECT_TARGET);
         if(playerController.isRightClicking()){
-            status.setAggressiveTowardTarget(true);
+            status.setAggressiveOnDetection(true);
         }
     }
 
@@ -165,7 +169,7 @@ public class Player extends MovingEntity {
         if(target == null){
             target = attackerObject;
         }
-        status.setAggressiveTowardTarget(true);
+        status.setAggressiveOnDetection(true);
         status.setIsHurt(true);
         playerController.loseHP(damage);
     }
@@ -199,14 +203,19 @@ public class Player extends MovingEntity {
 
     @Override
     public void dies() {
+        status.setIsDead(true);
         System.out.println("You died");
-        position.setX(50);
-        position.setY(50);
         for (LivingObject attacker: status.getAttackers()){
             /** Implement removing target **/
             ((NPC)attacker).getAiManager().setCurrentAIState(new Stand());
         }
+    }
+
+    public void respawn(){
+        status.setIsDead(false);
         status.setInCombat(false);
+        position.setX(50);
+        position.setY(50);
         stats.getHp().setCurrentHp(stats.getMaxHpValue());
 
     }
@@ -253,14 +262,16 @@ public class Player extends MovingEntity {
 
     /** Collision **/
     public CollisionBox getInteractionBox() {
+        int interactionWidth = 136;
+        int interactionHeight = 116;
         //South
-        if(direction.getAnimationRow() == 0) {return new CollisionBox(new Rectangle(position.intX() - 22, position.intY() + 40, size.getWidth() + 40, size.getHeight() + 20));}
+        if(direction.getAnimationRow() == 0) {return new CollisionBox(new Rectangle(position.intX() - interactionWidth / 2, position.intY() + 20, interactionWidth, interactionHeight));}
         //West
-        else if(direction.getAnimationRow() == 1) {return new CollisionBox(new Rectangle(position.intX() - 60, position.intY(), size.getWidth() + 20, size.getHeight() + 40));}
+        else if(direction.getAnimationRow() == 1) {return new CollisionBox(new Rectangle(position.intX() - interactionHeight, position.intY() - interactionHeight / 2, interactionHeight, interactionWidth));}
         //North
-        else if(direction.getAnimationRow() == 2) {return new CollisionBox(new Rectangle(position.intX() - 22, position.intY() - 48, size.getWidth() + 40, size.getHeight() + 60));}
+        else if(direction.getAnimationRow() == 2) {return new CollisionBox(new Rectangle(position.intX() - interactionWidth / 2, position.intY() - interactionWidth + 40, interactionWidth, interactionHeight));}
         //East
-        else {return new CollisionBox(new Rectangle(position.intX() + 30, position.intY(), size.getWidth() + 20, size.getHeight() + 40));}
+        else {return new CollisionBox(new Rectangle(position.intX(), position.intY() - interactionHeight / 2, interactionHeight, interactionWidth));}
     }
 
     public boolean meleeRangeCollidesWith(GameObject other) {
@@ -321,7 +332,7 @@ public class Player extends MovingEntity {
                 if(other instanceof NPC){
                     if(!((LivingObject)other).isDead()) {
                         targets(((LivingObject)other));
-                        status.setAggressiveTowardTarget(true);
+                        status.setAggressiveOnDetection(true);
                     } else if(playerController.isRightClicking()){
                         if (meleeRangeCollidesWith(other)){
                             loots((NPC)other);

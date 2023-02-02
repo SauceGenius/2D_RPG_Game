@@ -3,6 +3,7 @@ package stats;
 import core.Timer;
 import gameobject.GameObject;
 import gameobject.LivingObject;
+import gameobject.Player;
 
 import java.util.ArrayList;
 
@@ -17,7 +18,9 @@ public class StatusLiving {
     private boolean hasBeenLooted;
     private boolean aggressive;
     private boolean ranged;
+    private boolean canFlee;
     private Timer hurtTimer;
+    private Timer deathTimer;
     private ArrayList<LivingObject> attackers;
     private ArrayList<LivingObject> taggedObjects;
 
@@ -30,7 +33,9 @@ public class StatusLiving {
         isDead = false;
         hasBeenLooted = false;
         ranged = false;
+        canFlee = false;
         hurtTimer = new Timer();
+        deathTimer = new Timer();
         attackers = new ArrayList<>();
         taggedObjects = new ArrayList<>();
     }
@@ -40,8 +45,18 @@ public class StatusLiving {
         if(!isDead){
             if(thisLivingObject.getStats().getCurrentHpValue() <= 0 ) {
                 thisLivingObject.dies();
+                deathTimer.startClockSeconds(1);
+
+            }
+        } else {
+            if(thisLivingObject instanceof Player){
+                deathTimer.update();
+                if(deathTimer.timeIsUp()){
+                    ((Player)thisLivingObject).respawn();
+                }
             }
         }
+
 
         hasTargetInReach = false;
         if(isHurt){
@@ -127,12 +142,16 @@ public class StatusLiving {
         this.hasBeenLooted = looted;
     }
 
-    public void setAggressiveTowardTarget(boolean aggressive) {
+    public void setAggressiveOnDetection(boolean aggressive) {
         this.aggressive = aggressive;
     }
 
     public void setRanged(boolean ranged) {
         this.ranged = ranged;
+    }
+
+    public void setCanFlee(boolean canFlee) {
+        this.canFlee = canFlee;
     }
 
     /** Getters **/
@@ -174,5 +193,9 @@ public class StatusLiving {
 
     public ArrayList<LivingObject> getAttackers() {
         return attackers;
+    }
+
+    public boolean canFlee() {
+        return canFlee;
     }
 }

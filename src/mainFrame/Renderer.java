@@ -80,23 +80,23 @@ public class Renderer {
         for (int i = 0; i < currentState.getGameObjects().size(); i++) {
             GameObject tempObject = currentState.getGameObjects().get(i);
 
-            //Color of the nameplate
+            //Color of the target circle
             if (tempObject == (GameObject) player.getTarget()) {
                 graphics.setColor(new Color(255,0,0,120));
                 graphics.fillRoundRect(
-                        tempObject.getHitBox().getBounds().x - camera.getPosition().intX() + 5,
-                        tempObject.getHitBox().getBounds().y - camera.getPosition().intY() + 50,
-                        (int) (tempObject.getHitBox().getBounds().getWidth()/2 + 10),
-                        tempObject.getHitBox().getBounds().height/4,
-                        20,20);
+                        tempObject.getPosition().intX() - camera.getPosition().intX() - tempObject.getSize().getWidth() / 4,
+                        tempObject.getPosition().intY() - camera.getPosition().intY() + tempObject.getSize().getHeight() / 4,
+                        tempObject.getSize().getWidth() / 2,
+                        tempObject.getSize().getHeight() / 4,
+                        180,180);
 
                 graphics.setColor(Color.red);
                 graphics.drawRoundRect(
-                        tempObject.getHitBox().getBounds().x - camera.getPosition().intX() + 5,
-                        tempObject.getHitBox().getBounds().y - camera.getPosition().intY() + 50,
-                        (int) (tempObject.getHitBox().getBounds().getWidth()/2 + 10),
-                        tempObject.getHitBox().getBounds().height/4,
-                        20,20);
+                        tempObject.getPosition().intX() - camera.getPosition().intX() - tempObject.getSize().getWidth() / 4,
+                        tempObject.getPosition().intY() - camera.getPosition().intY() + tempObject.getSize().getHeight() / 4,
+                        tempObject.getSize().getWidth() / 2,
+                        tempObject.getSize().getHeight() / 4,
+                        180,180);
             }
         }
     }
@@ -120,8 +120,8 @@ public class Renderer {
                 FontMetrics metrics = graphics.getFontMetrics(namePlateFont);
                 int nameTextWidth = metrics.stringWidth(tempObject.getName());
 
-                int x = (int) (tempObject.getPosition().getX() - camera.getPosition().getX() - nameTextWidth/2 + 24);
-                int y = (int) (tempObject.getPosition().getY() - camera.getPosition().getY() - 45);
+                int x = (int) (tempObject.getPosition().getX() - camera.getPosition().getX() - nameTextWidth/2);
+                int y = (int) (tempObject.getPosition().getY() - camera.getPosition().getY() - tempObject.getSize().getHeight() / 2 - 22);
 
                 //graphics.setFont(new Font("FrizQuadrataStd-Bold", Font.PLAIN, 22));
 
@@ -151,10 +151,10 @@ public class Renderer {
             if (tempObject instanceof NPC && tempObject == target) {
                 if(!((LivingObject)tempObject).isDead()) {
 
-                    int x = (int) (tempObject.getPosition().getX() - camera.getPosition().getX() - 40);
-                    int y = (int) (tempObject.getPosition().getY() - camera.getPosition().getY() - 38);
                     int w = 100;
                     int h = 14;
+                    int x = (int) (tempObject.getPosition().getX() - camera.getPosition().getX() - ((w + 26) / 2));
+                    int y = (int) (tempObject.getPosition().getY() - camera.getPosition().getY() - tempObject.getSize().getHeight() / 2 - h - 2);
                     int arcW = 8;
                     int arcH = 10;
 
@@ -201,8 +201,8 @@ public class Renderer {
         //Auto attack critical damage floating text
         if (log.getCriticalDamageFloatingText()[0][0] != null && log.getCriticalDamageFloatingText()[0][4].equals("Critical"))
         {
-            x = Integer.parseInt(log.getCriticalDamageFloatingText()[0][2]) - camera.getPosition().intX() + 10;
-            y = Integer.parseInt(log.getCriticalDamageFloatingText()[0][3]) - camera.getPosition().intY() - 45;
+            x = Integer.parseInt(log.getCriticalDamageFloatingText()[0][2]) - camera.getPosition().intX() - 10;
+            y = Integer.parseInt(log.getCriticalDamageFloatingText()[0][3]) - camera.getPosition().intY() - 55;
 
             graphics.setFont(new Font("TimesRoman", Font.BOLD, 40));
             if (Integer.parseInt(log.getCriticalDamageFloatingText()[0][5]) >= 10) {
@@ -219,8 +219,8 @@ public class Renderer {
         for(int i = 0; i < log.getDamageFloatingText().length; i++) {
             if (log.getDamageFloatingText()[i] != null && log.getDamageFloatingText()[i][2] != null && log.getDamageFloatingText()[i][3] != null && log.getDamageFloatingText()[i][5] != null){
 
-                x = Integer.parseInt(log.getDamageFloatingText()[i][2]) - camera.getPosition().intX() + 14;
-                y = Integer.parseInt(log.getDamageFloatingText()[i][3]) - camera.getPosition().intY() - 35;
+                x = Integer.parseInt(log.getDamageFloatingText()[i][2]) - camera.getPosition().intX() - 8;
+                y = Integer.parseInt(log.getDamageFloatingText()[i][3]) - camera.getPosition().intY() - 45;
 
                 graphics.setFont(new Font("TimesRoman", Font.BOLD, 26));
                 graphics.setColor(new Color(0,0,0,175));
@@ -233,14 +233,26 @@ public class Renderer {
         if(log.getDamageFloatingTextTimer().timeIsUp()){log.clearDamageFloatingText();}
     }
 
-    // Dev mode //
+    /** Dev mode **/
     private void renderDevKit(State currentState, Graphics graphics) {
+        renderPosition(currentState, graphics);
         renderHitBox(currentState, graphics);
         renderCollisionBox(currentState, graphics);
+        renderRangedRangeBox(currentState, graphics);
         renderDetectionBox(currentState, graphics);
         renderInteractionBox(graphics);
         renderCombatInfo(graphics);
         renderMousePointer(graphics);
+    }
+
+    private void renderPosition(State currentState, Graphics graphics){
+        graphics.setColor(Color.red);
+
+        for (int i = 0; i < currentState.getGameObjects().size(); i++) {
+            GameObject tempObject = currentState.getGameObjects().get(i);
+            graphics.fillRect(tempObject.getPosition().intX() - camera.getPosition().intX(), tempObject.getPosition().intY() - camera.getPosition().intY(), 5 ,5);
+
+        }
     }
 
     private void renderHitBox(State currentState, Graphics graphics) {
@@ -255,6 +267,22 @@ public class Renderer {
                         tempObject.getHitBox().getBounds().y - camera.getPosition().intY(),
                         (int) tempObject.getHitBox().getBounds().getWidth(),
                         tempObject.getHitBox().getBounds().height);
+            }
+        }
+    }
+
+    private void renderRangedRangeBox(State currentState, Graphics graphics) {
+        for (int i = 0; i < currentState.getGameObjects().size(); i++) {
+            GameObject tempObject = currentState.getGameObjects().get(i);
+
+            //Color of the nameplate
+            if (tempObject instanceof NPC && ((NPC) tempObject).getStatus().isRanged()) {
+                graphics.setColor(Color.pink);
+                graphics.drawRect(
+                        ((NPC) tempObject).getRangedRangeBox().getBounds().x - camera.getPosition().intX(),
+                        ((NPC) tempObject).getRangedRangeBox().getBounds().y - camera.getPosition().intY(),
+                        (int) ((NPC) tempObject).getRangedRangeBox().getBounds().getWidth(),
+                        ((NPC) tempObject).getRangedRangeBox().getBounds().height);
             }
         }
     }

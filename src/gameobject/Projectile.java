@@ -1,49 +1,49 @@
-package ability;
+package gameobject;
 
-import controller.NPCController;
-import core.CollisionBox;
-import core.Direction;
-import core.Motion;
-import core.Position;
+import controller.ProjectileController;
+import core.*;
 import game.state.State;
 import gameobject.GameObject;
 import gameobject.LivingObject;
-import settings.Settings;
 
 import java.awt.*;
 
-public class Arrow extends GameObject {
+public class Projectile extends GameObject {
 
     private Image image;
-    private NPCController controller;
+    private ProjectileController controller;
     private LivingObject user;
     private LivingObject target;
     private Motion motion;
     private Direction direction;
     private int damage;
 
-    public Arrow(LivingObject user, LivingObject target, int damage){
+    public Projectile(LivingObject user, LivingObject target, int damage){
         super(log);
         this.user = user;
         this.target = target;
         this.position = new Position(user.getPosition().intX(), user.getPosition().intY());
-        this.controller = new NPCController();
+        this.size = new Size(14,14);
+        this.controller = new ProjectileController();
         this.motion = new Motion(15);
         this.direction = Direction.S;
         this.damage = damage;
         Toolkit toolkit = Toolkit.getDefaultToolkit();
-        this.image = toolkit.getImage("resources/sprites/Arrow.png");
+        this.image = toolkit.getImage("resources/sprites/RockProjectile.png");
     }
 
     @Override
     public void update(State state){
+        if(target.isDead()){
+            state.removeGameObject(this);
+        }
+
         motion.update(controller);
         position.apply(motion);
         manageDirection();
 
         controller.moveToTarget(target.getPosition(), this.position);
         if (arrived()){
-            System.out.println("arrow arrived");
             target.isHit(user, damage);
             state.removeGameObject(this);
         }
@@ -57,18 +57,17 @@ public class Arrow extends GameObject {
     }
 
     private boolean arrived(){
-        return position.isInMeleeRangeOf(target.getPosition());
+        return position.isInRangeOf(target.getPosition(), 5);
     }
 
     @Override
     public Image getSprite() {
-        //System.out.println("Arrow: " + position.intX() + "," + position.intY() + " Target: " + target.getPosition().intX() + "," + target.getPosition().intY());
         return image;
     }
 
     @Override
     public CollisionBox getCollisionBox() {
-        return new CollisionBox(new Rectangle(position.intX() + 10, position.intY() + Settings.SPRITE_SIZE_PLAYER/2 - 4, size.getWidth()/2, size.getHeight()/4 + 4));
+        return new CollisionBox(new Rectangle(position.intX() - size.getWidth()/2, position.intY() - size.getHeight()/2, size.getWidth(), size.getHeight()));
     }
 
     @Override

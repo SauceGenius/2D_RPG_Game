@@ -42,8 +42,8 @@ public class Position {
         y += vector.getY();
     }
 
-    public boolean isInRangeOf(Position position) {
-        return Math.abs(x - position.getX()) < Position.PROXIMITY_RANGE && Math.abs(y - position.getY()) < Position.PROXIMITY_RANGE;
+    public boolean isInRangeOf(Position position, int proximityTolerance) {
+        return Math.abs(x - position.getX()) < Position.PROXIMITY_RANGE * proximityTolerance && Math.abs(y - position.getY()) < Position.PROXIMITY_RANGE;
     }
 
     public boolean isInMeleeRangeOf(Position position) {

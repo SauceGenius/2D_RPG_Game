@@ -16,14 +16,15 @@ public abstract class MovingEntity extends LivingObject {
     protected MovementController controller;
     protected AudioPlayer audioPlayer;
     protected Motion motion;
-    protected AnimationManager animationManager;
+    protected double walkingSpeed = 1;
+    protected double runningSpeed = 3;
     protected Direction direction;
 
     /** Constructor **/
     public MovingEntity(AudioPlayer audioPlayer, Log log){
         super(log);
         this.audioPlayer = audioPlayer;
-        this.motion = new Motion(3);
+        this.motion = new Motion(runningSpeed);
         this.direction = Direction.S;
     }
 
@@ -45,23 +46,6 @@ public abstract class MovingEntity extends LivingObject {
     protected abstract void decideAnimation();
 
     /** Collision **/
-    @Override
-    public CollisionBox getCollisionBox() {
-        return new CollisionBox(new Rectangle(position.intX() + 10, position.intY() + Settings.SPRITE_SIZE_PLAYER/2 - 4, size.getWidth()/2, size.getHeight()/4 + 4));
-    }
-
-    public CollisionBox getHitBox(){
-        return new CollisionBox(new Rectangle(position.intX(), position.intY(), size.getWidth(), size.getHeight()));
-    }
-
-    public CollisionBox getDetectionBox(){
-        return new CollisionBox(new Rectangle(position.intX() - 250, position.intY() - 250, size.getWidth() + 500, size.getHeight() + 500));
-    }
-
-    @Override
-    public boolean collidesWith(GameObject other) {
-        return getCollisionBox().collidesWith(other.getCollisionBox());
-    }
 
     private void handleCollisions(State state) {
         state.getCollidingObjects(this).forEach(this::handleCollisions);
@@ -80,12 +64,19 @@ public abstract class MovingEntity extends LivingObject {
         this.animationManager = animationManager;
     }
 
-    /** Getters **/
-    @Override
-    public Image getSprite() {
-        return animationManager.getSprite();
+    public void setWalkingSpeed(double walkingSpeed) {
+        this.walkingSpeed = walkingSpeed;
     }
 
+    public void setRunningSpeed(double runningSpeed) {
+        this.runningSpeed = runningSpeed;
+    }
+
+    public void setDirection(Direction direction) {
+        this.direction = direction;
+    }
+
+    /** Getters **/
     public MovementController getController() {
         return controller;
     }
@@ -94,7 +85,15 @@ public abstract class MovingEntity extends LivingObject {
         return motion;
     }
 
-    public AnimationManager getAnimationManager() {
-        return animationManager;
+    public double getWalkingSpeed() {
+        return walkingSpeed;
+    }
+
+    public double getRunningSpeed() {
+        return runningSpeed;
+    }
+
+    public Direction getDirection() {
+        return direction;
     }
 }

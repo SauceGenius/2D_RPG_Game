@@ -22,11 +22,11 @@ public class AnimationManager {
     private StatusLiving status;
     private BufferedImage currentAnimationSheet;
     private Time autoAttackAnimationTimer;
+    private Time deathTime;
     private int updatesPerFrame;
     private int currentFrameTime;
     private int frameIndex;
     private int directionIndex;
-    private Time deathTime;
     private boolean isPlayingAutoAttackAnimation;
     private boolean isDying;
 
@@ -47,15 +47,15 @@ public class AnimationManager {
     }
 
     public Image getSprite(){
-        if(frameIndex >= currentAnimationSheet.getWidth() / Settings.SPRITE_SIZE_PLAYER) {
+        if(frameIndex >= currentAnimationSheet.getWidth() / /**Settings.SPRITE_SIZE_PLAYER**/ movingEntity.getSize().getWidth()) {
             frameIndex = 0;
         }
 
         return currentAnimationSheet.getSubimage(
-                frameIndex * Settings.SPRITE_SIZE_PLAYER,
-                directionIndex * Settings.SPRITE_SIZE_PLAYER,
-                Settings.SPRITE_SIZE_PLAYER,
-                Settings.SPRITE_SIZE_PLAYER);
+                frameIndex * movingEntity.getSize().getWidth() /*Settings.SPRITE_SIZE_PLAYER*/,
+                directionIndex * movingEntity.getSize().getWidth() /*Settings.SPRITE_SIZE_PLAYER*/,
+                movingEntity.getSize().getWidth() /*Settings.SPRITE_SIZE_PLAYER*/,
+                movingEntity.getSize().getWidth() /*Settings.SPRITE_SIZE_PLAYER*/);
     }
 
     public void update(Direction direction){
@@ -74,7 +74,7 @@ public class AnimationManager {
                     currentFrameTime = 0;
                     frameIndex++;
 
-                    if (frameIndex >= currentAnimationSheet.getWidth() / Settings.SPRITE_SIZE_PLAYER) {
+                    if (frameIndex >= currentAnimationSheet.getWidth() / movingEntity.getSize().getWidth() /*Settings.SPRITE_SIZE_PLAYER*/) {
                         frameIndex = 0;
                     }
                 }
@@ -97,7 +97,7 @@ public class AnimationManager {
                     currentFrameTime = 0;
                     frameIndex++;
 
-                    if (frameIndex >= currentAnimationSheet.getWidth() / Settings.SPRITE_SIZE_PLAYER) {
+                    if (frameIndex >= currentAnimationSheet.getWidth() / movingEntity.getSize().getWidth() /*Settings.SPRITE_SIZE_PLAYER*/) {
                         frameIndex = 0;
                     }
                 }
@@ -113,7 +113,7 @@ public class AnimationManager {
                 currentFrameTime = 0;
                 frameIndex++;
 
-                if (frameIndex >= currentAnimationSheet.getWidth() / Settings.SPRITE_SIZE_PLAYER) {
+                if (frameIndex >= currentAnimationSheet.getWidth() / movingEntity.getSize().getWidth() /*Settings.SPRITE_SIZE_PLAYER*/) {
                     frameIndex = 0;
                 }
             }
@@ -143,6 +143,12 @@ public class AnimationManager {
         }
     }
 
+    public void stopCurrentAnimation(){
+        if(isPlayingAutoAttackAnimation){
+            isPlayingAutoAttackAnimation = false;
+        }
+    }
+
     public void setIsDying(boolean isDying) {
         frameIndex = 0;
         this.isDying = isDying;
@@ -152,11 +158,7 @@ public class AnimationManager {
         this.spriteSet = spriteSet;
     }
 
-    /*public void attackAnimation() {
-        frameIndex = 0;
-        attackTime.restartClock();
-        this.isAttacking = true;
-    }*/
-
-    public boolean isPlayingAutoAttackAnimation() {return isPlayingAutoAttackAnimation;}
+    public boolean isPlayingAutoAttackAnimation() {
+        return isPlayingAutoAttackAnimation;
+    }
 }

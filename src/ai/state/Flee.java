@@ -3,28 +3,32 @@ package ai.state;
 import ai.AITransition;
 import controller.NPCController;
 import core.Position;
-import gameobject.NPC;
 import game.state.State;
+import gameobject.NPC;
+import gameobject.Player;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Wander extends AIState{
+public class Flee extends AIState{
+
     private List<Position> targets;
 
-    public Wander() {
+    public Flee(){
         super();
         targets = new ArrayList<>();
     }
 
     @Override
     protected AITransition initializeTransition() {
-        return new AITransition("stand", ((state, currentCharacter) -> arrived(currentCharacter)));
+        return new AITransition("combat", ((state, currentCharacter) ->
+                !currentCharacter.getRangedRangeBox().collidesWith(currentCharacter.getTarget().getHitBox())));
+                //!((Player)currentCharacter.getTarget()).getInteractionBox().collidesWith(currentCharacter.getHitBox())));
     }
 
     @Override
     public void update(State state, NPC currentCharacter) {
-        currentCharacter.getMotion().setSpeed(currentCharacter.getWalkingSpeed());
+        currentCharacter.getMotion().setSpeed(currentCharacter.getRunningSpeed());
 
         if(targets.isEmpty()){
             targets.add(state.getRandomPosition());
@@ -34,7 +38,7 @@ public class Wander extends AIState{
         controller.moveToTarget(targets.get(0), currentCharacter.getPosition());
 
         if(arrived(currentCharacter)){
-            controller.stop();
+            //targets.remove(0);
         }
     }
 

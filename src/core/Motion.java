@@ -1,6 +1,7 @@
 package core;
 
 import controller.MovementController;
+import controller.ProjectileController;
 
 
 public class Motion {
@@ -25,7 +26,15 @@ public class Motion {
         int deltaX = 0;
         int deltaY = 0;
 
-        if(isCasting == false) {
+        if(controller instanceof ProjectileController){
+            deltaX = (int)((ProjectileController)controller).getDeltaX();
+            deltaY = (int)((ProjectileController)controller).getDeltaY();
+
+            /**vector = new Vector2D(deltaX, deltaY);
+            vector.normalize();
+            vector.multiply(speed);**/
+
+        } else if(isCasting == false) {
             if (controller.isRequestingUp()) {
                 deltaY--;
             }
@@ -41,19 +50,20 @@ public class Motion {
             if (controller.isRequestingRight()) {
                 deltaX++;
             }
+
         }
 
         vector = new Vector2D(deltaX, deltaY);
-        //vector.normalize();
-        if (controller.isRequestingSprint()) {
+        vector.normalize();
+        if(controller.isRequestingSprint())
             vector.multiply(sprintSpeed);
-        } else {vector.multiply(speed);}
-
+        else vector.multiply(speed);
     }
 
     /** Setters **/
     public void setSpeed(double speed) {
         this.speed = speed;
+        this.sprintSpeed = 2 * speed;
     }
 
     public void setAttacking(boolean attacking) {

@@ -56,7 +56,6 @@ public abstract class State {
             for (int y = 0; y < gameObjects.size(); y++){
                 if(gameObjects.get(y) == toRemoveGameObjects.get(i)){
                     gameObjects.remove(y);
-                    System.out.println("Removed GameObject");
                     y--;
                 }
             }

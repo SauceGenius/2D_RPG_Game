@@ -8,7 +8,9 @@ import ai.state.Combat;
 import audio.AudioLibrary;
 import audio.AudioPlayer;
 import controller.NPCController;
+import core.Direction;
 import core.Log;
+import core.Size;
 import core.Timer;
 import item.Item;
 import game.state.State;
@@ -31,6 +33,7 @@ public abstract class NPC extends MovingEntity {
     /** Constructor **/
     public NPC(AudioPlayer audioPlayer, Log log) {
         super(audioPlayer, log);
+        this.size = new Size(96,96);
         this.autoAttackSpeedTimer = new Timer();
         this.npcController = new NPCController();
         this.controller = npcController;
@@ -41,15 +44,26 @@ public abstract class NPC extends MovingEntity {
     /** Methods **/
     @Override
     public void update(State state) {
+        manageDirection();
         status.update(this);
         super.update(state);
-        manageDirection();
         decideAnimation();
         animationManager.update(direction);
         aiManager.update(state, this);
 
         if(currentAbility != null){
             currentAbility.update(state);
+        }
+    }
+
+    @Override
+    protected void manageDirection() {
+        if(motion.isMoving()){
+            this.direction = Direction.fromMotion(motion);
+        } else if(status.isRanged() && status.hasTargetInReach() && !status.isAutoAttacking()){
+            //if(!direction.isFacingTarget(target, target)){
+                this.direction = direction.fromTarget(target, this);
+            //}
         }
     }
 
@@ -68,7 +82,7 @@ public abstract class NPC extends MovingEntity {
             Player player = (Player) aggroedGameObject;
             if(!status.isInCombat()){
                 status.setInCombat(true);
-                getAiManager().setCurrentAIState(new Combat(player));
+                getAiManager().setCurrentAIState(new Combat());
                 audioPlayer.playSound(AudioLibrary.GOBLIN_AGGRO);
                 player.aggroed(this);
             }
@@ -149,6 +163,10 @@ public abstract class NPC extends MovingEntity {
 
     public AIManager getAiManager() {
         return aiManager;
+    }
+
+    public LivingObject getTarget() {
+        return target;
     }
 
     /** Collision **/
