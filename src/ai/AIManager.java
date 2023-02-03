@@ -30,6 +30,7 @@ public class AIManager {
 
     private void transitionTo(String nextState) {
         //System.out.println("Goblin is transitioning to " + nextState);
+
         switch (nextState) {
             case "flee" -> currentAIState = new Flee();
             case "combat" -> currentAIState = new Combat();

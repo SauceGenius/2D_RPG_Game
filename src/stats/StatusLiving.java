@@ -22,7 +22,7 @@ public class StatusLiving {
     private Timer hurtTimer;
     private Timer deathTimer;
     private ArrayList<LivingObject> attackers;
-    private ArrayList<LivingObject> taggedObjects;
+    private ArrayList<LivingObject> attackedObjects;
 
     public StatusLiving(){
         isInvincible = false;
@@ -37,7 +37,7 @@ public class StatusLiving {
         hurtTimer = new Timer();
         deathTimer = new Timer();
         attackers = new ArrayList<>();
-        taggedObjects = new ArrayList<>();
+        attackedObjects = new ArrayList<>();
     }
 
     public void update(LivingObject thisLivingObject){
@@ -86,23 +86,23 @@ public class StatusLiving {
         attackers.remove(attackerObject);
     }
 
-    public void addTaggedObject(LivingObject taggedObject){
+    public void addAttackedObject(LivingObject taggedObject){
         boolean newTag = true;
-        if(taggedObjects.size() > 0){
-            for(GameObject tagged: taggedObjects){
+        if(attackedObjects.size() > 0){
+            for(GameObject tagged: attackedObjects){
                 if (tagged == taggedObject){
                     newTag = false;
                 }
             }
             if(newTag){
-                taggedObjects.add(taggedObject);
+                attackedObjects.add(taggedObject);
             }
         }
-        taggedObjects.add(taggedObject);
+        attackedObjects.add(taggedObject);
     }
 
-    public void removeTaggedObject(GameObject gameObject){
-        taggedObjects.remove(gameObject);
+    public void removeAttackedObject(GameObject gameObject){
+        attackedObjects.remove(gameObject);
     }
 
     /** Setters **/
@@ -183,7 +183,7 @@ public class StatusLiving {
         return hasBeenLooted;
     }
 
-    public boolean isAggressiveTowardTarget() {
+    public boolean isAggressiveOnDectection() {
         return aggressive;
     }
 
@@ -193,6 +193,10 @@ public class StatusLiving {
 
     public ArrayList<LivingObject> getAttackers() {
         return attackers;
+    }
+
+    public ArrayList<LivingObject> getAttackedObjects() {
+        return attackedObjects;
     }
 
     public boolean canFlee() {

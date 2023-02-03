@@ -5,6 +5,7 @@ import ability.MeleeAutoAttack;
 import ability.RangedAutoAttack;
 import ai.AIManager;
 import ai.state.Combat;
+import ai.state.Stand;
 import audio.AudioLibrary;
 import audio.AudioPlayer;
 import controller.NPCController;
@@ -60,10 +61,8 @@ public abstract class NPC extends MovingEntity {
     protected void manageDirection() {
         if(motion.isMoving()){
             this.direction = Direction.fromMotion(motion);
-        } else if(status.isRanged() && status.hasTargetInReach() && !status.isAutoAttacking()){
-            //if(!direction.isFacingTarget(target, target)){
-                this.direction = direction.fromTarget(target, this);
-            //}
+        } else if(target != null && status.isRanged() && status.hasTargetInReach() && !status.isAutoAttacking()){
+            this.direction = direction.fromTarget(target, this);
         }
     }
 
@@ -77,6 +76,8 @@ public abstract class NPC extends MovingEntity {
     }
 
     public void aggroes(LivingObject aggroedGameObject){
+        status.addAttackedObject(aggroedGameObject);
+
         if(aggroedGameObject instanceof Player){
             target = aggroedGameObject;
             Player player = (Player) aggroedGameObject;
@@ -87,7 +88,8 @@ public abstract class NPC extends MovingEntity {
                 player.aggroed(this);
             }
         }
-        if(aggroedGameObject instanceof NPC){
+
+        else if(aggroedGameObject instanceof NPC){
             System.out.println("NPC aggroing another npc is not implemented yet");
         }
     }
@@ -111,11 +113,6 @@ public abstract class NPC extends MovingEntity {
     protected abstract void playAutoAttackSound();
 
     @Override
-    public void taggedGameObjectIsKilled(LivingObject killedGameObject) {
-
-    }
-
-    @Override
     public void isHit(LivingObject attackerObject, int damage) {
         status.addAttacker(attackerObject);
         if(target == null){
@@ -134,6 +131,28 @@ public abstract class NPC extends MovingEntity {
     }
 
     @Override
+    public void attackerObjectDied(LivingObject attackerObjectDied) {
+        if(attackerObjectDied == target) {
+            target = null;
+        }
+        status.removeAttacker(attackerObjectDied);
+    }
+
+    @Override
+    public void attackedObjectDied(LivingObject attackedObjectDied) {
+        if(attackedObjectDied == target) {
+            target = null;
+        }
+        status.removeAttackedObject(attackedObjectDied);
+        if(status.getAttackedObjects().isEmpty()) {
+            currentAbility = null;
+            aiManager.setCurrentAIState(new Stand());
+            status.setInCombat(false);
+        }
+
+    }
+
+    @Override
     public void dies(){
         stats.getHp().setCurrentHp(0);
         status.setIsDead(true);
@@ -142,7 +161,7 @@ public abstract class NPC extends MovingEntity {
         currentAbility = null;
         audioPlayer.playSound(AudioLibrary.GOBLIN_DEATH);
         for(LivingObject attacker: status.getAttackers()){
-            attacker.taggedGameObjectIsKilled(this);
+            attacker.attackedObjectDied(this);
         }
 
     }
@@ -150,6 +169,10 @@ public abstract class NPC extends MovingEntity {
     /** Setters **/
     public void setCurrentAbility(Ability currentAbility) {
         this.currentAbility = currentAbility;
+    }
+
+    public void setTarget(LivingObject target) {
+        this.target = target;
     }
 
     /** Getters **/
@@ -192,12 +215,14 @@ public abstract class NPC extends MovingEntity {
 
     @Override
     protected void handleDetectionCollisions(GameObject otherGameObject) {
-        if(!isDead()){
+        if(!((LivingObject)otherGameObject).isDead()){
             if(otherGameObject instanceof Player){
 
                 /** NPC SEES PLAYER **/
-                if(status.isAggressiveTowardTarget()){
-                    this.aggroes((LivingObject) otherGameObject);
+                if(status.isAggressiveOnDectection()){
+                    if(!status.getAttackedObjects().contains(otherGameObject)){
+                        this.aggroes((LivingObject) otherGameObject);
+                    }
                 }
             }
         }

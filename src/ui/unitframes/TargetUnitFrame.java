@@ -1,11 +1,9 @@
 package ui.unitframes;
 
 import audio.AudioPlayer;
-import core.CollisionBox;
 import core.Position;
-import gameobject.GameObject;
 import gameobject.LivingObject;
-import gameobject.MovingEntity;
+import gameobject.NPC;
 import gameobject.Player;
 import gfx.SpriteLibrary;
 
@@ -57,7 +55,7 @@ public class TargetUnitFrame extends UnitFrame {
             if(player.getTarget() != null){
                 graphics.setColor(new Color(70,70,70,150));
                 graphics.fillRect(position.intX(), y,w,40);
-                if(player.getTarget().getStatus().isAggressiveTowardTarget()){
+                if(player.getTarget().getStatus().isAggressiveOnDectection()){
                     graphics.setColor(Color.red);
                 } else graphics.setColor(Color.yellow);
                 FontMetrics metrics = graphics.getFontMetrics(unitFramesFont);
@@ -102,6 +100,13 @@ public class TargetUnitFrame extends UnitFrame {
                 graphics.drawArc(position.intX() + 191,y + 30,20,20,360,360);
                 graphics.setColor(Color.yellow);
                 graphics.drawString(Integer.toString(target.getLevel()), position.intX() + 199, y + 45);
+
+                /** Temporary Target's target **/
+                if(((NPC)target).getTarget() != null){
+                    graphics.setColor(Color.BLUE);
+                    graphics.setFont(new Font("Arial", Font.BOLD, 30));
+                    graphics.drawString(((NPC)target).getTarget().getName(), position.intX() + 250, y + 45);
+                }
             }
         }
     }

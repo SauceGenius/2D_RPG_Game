@@ -4,7 +4,6 @@ import core.CollisionBox;
 import core.Log;
 import game.state.State;
 import gfx.AnimationManager;
-import settings.Settings;
 import stats.Stats;
 import stats.StatusLiving;
 
@@ -27,6 +26,7 @@ public abstract class LivingObject extends GameObject {
 
     }
 
+    /** Getters **/
     public boolean isHurt(){
         return status.isHurt();
     }
@@ -54,12 +54,14 @@ public abstract class LivingObject extends GameObject {
     public int getLevel() {
         return stats.getLevel().getLevelValue();
     }
+
     /** Abstract **/
     public abstract void autoAttacks(LivingObject target);
+    public abstract void attackerObjectDied(LivingObject killedEnemy);
     public abstract void isHit(LivingObject attackerObject, int damage);
     public abstract void dies() ;
 
-    public abstract void taggedGameObjectIsKilled(LivingObject killedGameObject);
+    public abstract void attackedObjectDied(LivingObject killedGameObject);
 
     /** Collision **/
     @Override

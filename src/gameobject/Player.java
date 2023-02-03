@@ -1,18 +1,14 @@
 package gameobject;
 
-import ai.state.Stand;
 import audio.AudioLibrary;
-import core.Size;
+import core.*;
 import inventory.Inventory;
 import audio.AudioPlayer;
 import controller.MovementController;
 import controller.PlayerController;
-import core.CollisionBox;
-import core.Log;
 import equipment.Equipment;
 import item.Item;
 import stats.Stats;
-import core.Timer;
 import game.state.State;
 import gfx.AnimationManager;
 import gfx.SpriteLibrary;
@@ -101,7 +97,7 @@ public class Player extends MovingEntity {
             /** Will have to find a better way to leave combat **/
             leavingCombat();
         }
-        if (status.isAggressiveTowardTarget()) {
+        if (status.isAggressiveOnDectection()) {
             if (status.hasTargetInReach() && !target.isDead()) {
                 if (autoAttackTimer.timeIsUp()) {
                     /** Activate Auto Attack **/
@@ -127,13 +123,13 @@ public class Player extends MovingEntity {
                 log.addToDamageLog(name, target.name, Integer.toString(target.position.intX()), Integer.toString(target.position.intY()),"Hit",Integer.toString(damage), "Physical");
             }
 
-            ((LivingObject)target).isHit((LivingObject) this, damage);
+            target.isHit(this, damage);
         } else {
             /** Miss **/
             audioPlayer.playSound(AudioLibrary.MISS_2H);
             log.addToDamageLog(name,target.name, Integer.toString(target.position.intX() - 20), Integer.toString(target.position.intY()),"Miss","Miss", "Miss");
         }
-        status.addTaggedObject(target);
+        status.addAttackedObject(target);
     }
 
     public boolean attackHits(){
@@ -175,13 +171,21 @@ public class Player extends MovingEntity {
     }
 
     @Override
-    public void taggedGameObjectIsKilled(LivingObject killedGameObject) {
+    public void attackerObjectDied(LivingObject killedGameObject) {
         if(killedGameObject == target){
             target = null;
         }
-        gainExp(killedGameObject);
         status.removeAttacker(killedGameObject);
-        status.removeTaggedObject(killedGameObject);
+    }
+
+    @Override
+    public void attackedObjectDied(LivingObject killedGameObject) {
+        if(killedGameObject == target){
+            target = null;
+        }
+        status.removeAttackedObject(killedGameObject);
+
+        gainExp(killedGameObject);
     }
 
     public void gainExp(LivingObject gameObject) {
@@ -205,19 +209,28 @@ public class Player extends MovingEntity {
     public void dies() {
         status.setIsDead(true);
         System.out.println("You died");
-        for (LivingObject attacker: status.getAttackers()){
-            /** Implement removing target **/
-            ((NPC)attacker).getAiManager().setCurrentAIState(new Stand());
+        target = null;
+        status.setInCombat(false);
+
+        for(int i = 0; i < status.getAttackers().size(); i++){
+            status.getAttackers().get(i).attackedObjectDied(this);
+            status.removeAttacker(status.getAttackers().get(i));
+            i--;
+        }
+
+        for(int i = 0; i < status.getAttackedObjects().size(); i++){
+                status.getAttackedObjects().get(i).attackerObjectDied(this);
+                status.removeAttackedObject(status.getAttackedObjects().get(i));
+                i--;
         }
     }
 
     public void respawn(){
+        setPosition(new Position(50,50));
         status.setIsDead(false);
+        target = null;
         status.setInCombat(false);
-        position.setX(50);
-        position.setY(50);
         stats.getHp().setCurrentHp(stats.getMaxHpValue());
-
     }
 
     public void enteringCombat(){

@@ -1,15 +1,11 @@
 package mainFrame;
 
-import character.Character;
 import core.Log;
 import game.state.GameState;
 import game.state.MainMenuState;
 import gameobject.LivingObject;
 import gameobject.NPC;
-import login.AccountController;
-import ui.UIController;
 import gameobject.GameObject;
-import id.GameObjectID;
 import gameobject.Player;
 import game.state.State;
 import map.Tile;
@@ -132,7 +128,7 @@ public class Renderer {
                 /** Color of the nameplate **/
                 if(((LivingObject)tempObject).isDead()) {
                     graphics.setColor(Color.gray);
-                } else if(((LivingObject)tempObject).getStatus().isAggressiveTowardTarget()){
+                } else if(((LivingObject)tempObject).getStatus().isAggressiveOnDectection()){
                     graphics.setColor(Color.red);
                 } else graphics.setColor(Color.yellow);
 
@@ -161,7 +157,7 @@ public class Renderer {
                     //Health bar
                     graphics.setColor(new Color(60,63,68, 150));
                     graphics.fillRoundRect(x, y, w, h, arcW,arcH);
-                    if (((LivingObject)tempObject).getStatus().isAggressiveTowardTarget()){
+                    if (((LivingObject)tempObject).getStatus().isAggressiveOnDectection()){
                         graphics.setColor(Color.red);
                     } else {
                         graphics.setColor(Color.yellow);

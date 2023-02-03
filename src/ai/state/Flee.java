@@ -3,6 +3,7 @@ package ai.state;
 import ai.AITransition;
 import controller.NPCController;
 import core.Position;
+import core.Vector2D;
 import game.state.State;
 import gameobject.NPC;
 import gameobject.Player;
@@ -27,22 +28,35 @@ public class Flee extends AIState{
     }
 
     @Override
-    public void update(State state, NPC currentCharacter) {
-        currentCharacter.getMotion().setSpeed(currentCharacter.getRunningSpeed());
+    public void update(State state, NPC currentNPC) {
+        currentNPC.getMotion().setSpeed(currentNPC.getRunningSpeed());
 
         if(targets.isEmpty()){
+            //targets.add(findPositionToFlee(currentNPC));
             targets.add(state.getRandomPosition());
         }
 
-        NPCController controller = (NPCController) currentCharacter.getController();
-        controller.moveToTarget(targets.get(0), currentCharacter.getPosition());
+        NPCController controller = (NPCController) currentNPC.getController();
+        controller.moveToTarget(targets.get(0), currentNPC.getPosition());
 
-        if(arrived(currentCharacter)){
+        if(arrived(currentNPC)){
             //targets.remove(0);
         }
     }
 
     private boolean arrived(NPC currentCharacter){
-        return currentCharacter.getPosition().isInRangeOf(targets.get(0), 1);
+        if(!targets.isEmpty()){
+            return currentCharacter.getPosition().isInRangeOf(targets.get(0), 1);
+        }
+        return false;
+    }
+
+    private Position findPositionToFlee(NPC currentNPC){
+        int x = currentNPC.getPosition().intX() - currentNPC.getTarget().getPosition().intX();
+        int y = currentNPC.getPosition().intY() - currentNPC.getTarget().getPosition().intY();
+
+        Vector2D vector = new Vector2D(x, y);
+
+        return null;
     }
 }

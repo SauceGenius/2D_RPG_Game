@@ -6,7 +6,7 @@ import game.state.State;
 
 public abstract class AIState {
 
-    private AITransition transition;
+    protected AITransition transition;
 
     public AIState() {
         this.transition = initializeTransition();
@@ -20,6 +20,7 @@ public abstract class AIState {
         return transition.shouldTransition(state, currentCharacter);
     }
 
+    /** Getters **/
     public String getNextState(){
         return transition.getNextState();
     }

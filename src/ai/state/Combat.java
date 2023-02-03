@@ -20,7 +20,6 @@ public class Combat extends AIState{
         this.autoAttackTimer = new Timer(0.1);
     }
 
-
     @Override
     protected AITransition initializeTransition() {
         return new AITransition("flee", ((state, currentCharacter) ->
@@ -33,6 +32,13 @@ public class Combat extends AIState{
     @Override
     public void update(State state, NPC currentNPC) {
         target = currentNPC.getTarget();
+
+        /**
+        if(target != null && target.isDead()){
+            target = null;
+            System.out.println("CHANGE TO STAND BECAUSE TARGET DIED");
+            transition = new AITransition("stand", ((state, currentCharacter) -> target.isDead()));
+        }**/
 
         currentNPC.getMotion().setSpeed(currentNPC.getRunningSpeed());
 
